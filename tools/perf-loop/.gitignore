@@ -1,0 +1,2 @@
+# 每轮压测产物（monkey.log / logcat.txt / round.json / summary.md），不入库
+reports/

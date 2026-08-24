@@ -1,0 +1,78 @@
+================================================================================
+【方案】阶段1：分布式 agentic —— 中心大脑 + 远端工具执行
+分支 feat/lan-distributed-agent
+================================================================================
+
+目标：中心机的「大脑(LLM)」做推理，工具(读/写/改文件、跑命令、gradle)在「工程所在的
+远端机」本地执行。远端把环境/文件/命令输出作为上下文回传，循环直到完成。
+—— 即「Claude/大脑在我这，工程和执行在他们机器上」的真正落地。
+
+────────────────────────────────────────────────
+一、关键技术分叉（大脑用什么）
+────────────────────────────────────────────────
+约束：Claude Code CLI 是「大脑+手脚一体」拆不开，且 CLI 订阅登录无法被远程驱动工具。
+要「中心大脑 + 远端工具」，大脑必须是「API 形态的 tool-use 循环」，两个选项：
+
+  A) api-engine（已存在）：OpenAI 兼容（Qwen/Kimi/DeepSeek/OpenAI…）
+     - 现成：gateway/services/api-engine.js 已实现 tool-use 循环；
+       api-tools.js 已定义工具(read/write/edit/list/bash)。
+     - 只需把「工具执行」从本地改成「转发到远端执行器」即可成为分布式 agentic。
+     - 代价：大脑不是 Claude（是你配的 OpenAI 兼容模型，需对应 API key）。
+
+  B) Claude API（Anthropic Messages tool-use）：大脑是 Claude
+     - 需要 Anthropic API key（与 CLI 订阅是两套计费）。
+     - 请求/响应格式与 OpenAI 不同，要新增一个 Anthropic 引擎适配。
+     - 这才是「中心大脑=Claude」的唯一正路。
+
+结论：先用 A 打通分布式 agentic 全链路（最快见效、复用现成循环）；
+      想要「Claude 当大脑」再加 B（Anthropic 引擎，需 key）。两者共用同一套远端执行器。
+
+────────────────────────────────────────────────
+二、总体架构
+────────────────────────────────────────────────
+  中心机（大脑）
+    └─ agent 循环（api-engine：发 messages+tools → 拿 tool_calls → 执行 → 回灌 → 重复）
+         · 工具执行不在本地，而是 HTTP 调「目标远端」的 /api/executor/run-tool
+         · 目标远端 = 该任务/故事点选定的「远端机 + 工程 root」
+
+  远端机（手脚）——【本阶段已实现 ✅】
+    └─ /api/executor  执行器
+         · run-tool: 在 root 工程内执行 read_file/write_file/edit_file/list_dir/run_bash
+         · 安全：token 鉴权 + root 必在白名单(本机配置工程/克隆目录) + 路径不得越出 root
+         · /projects: 本机有哪些工程  /health: 启用状态 + 白名单
+
+循环数据流：
+  中心 agent → (tool_call) → HTTP → 远端 /api/executor/run-tool → 本地执行 → 结果回传
+            → 中心把结果回灌给 LLM → LLM 决定下一步 … → 完成
+
+────────────────────────────────────────────────
+三、本阶段已完成（commit 见分支）
+────────────────────────────────────────────────
+  [新] gateway/services/executor.js   —— runTool(root,name,args)：沙箱工具执行
+        · read_file/write_file/edit_file/list_dir/run_bash
+        · safeResolve 防路径越界；allowedRoots()=配置工程+webApp+cloneParent+executor.allowedRoots
+  [新] gateway/routes/executor.js     —— /run-tool /projects /health（token 鉴权）
+  [改] config.js                       —— executor:{enabled,token,allowedRoots}
+  [改] server.js                       —— 挂载 /api/executor
+  [改] Settings.jsx                    —— 「③ 本机作为远端执行器」开关+token
+  实测：list_dir/run_bash 在工程内正确执行；路径越界拦截 ✅；root 白名单拦截 ✅；token 鉴权 ✅。
+
+────────────────────────────────────────────────
+四、下一步（中心编排，未做）
+────────────────────────────────────────────────
+  1) 远端注册/发现：中心维护「远端机列表」(host/token/可用工程)；
+     可手动配置或远端来注册。故事点可选「在哪台远端、哪个工程」执行。
+  2) 工具转发：改 api-engine 的 executeTool 调用 → 当任务标记 remoteTarget 时，
+     HTTP 调 remoteTarget 的 /api/executor/run-tool（替代本地 executeTool）。
+     · 新增 services/remote-tools.js：runRemoteTool(target, name, args)
+     · api-engine.executeApiEngine 接受 task.remoteTarget，工具走远端
+  3) 大脑选项 B：新增 Anthropic 引擎适配（Messages tool-use），让 Claude 当大脑（需 key）。
+  4) 进度/流式：把远端工具调用与 LLM 思考经 WS 推给发起方前端（体验同本地）。
+  5) 安全增强：run_bash 命令审计日志 / 可选命令白名单 / 速率限制。
+
+────────────────────────────────────────────────
+五、与阶段0 的关系
+────────────────────────────────────────────────
+  阶段0：中心 Claude 只接「非 agentic 文本任务」（报告等），已完成(claude-proxy)。
+  阶段1：中心大脑(api-engine/Anthropic) + 远端执行器，做「真正改代码的 agentic 任务」。
+  两阶段叠加：文本任务走中心 Claude；agentic 任务走「中心大脑 + 远端手脚」。

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/evidence-manifest-v2.json",
+  "title": "Evidence Manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "storyId",
+    "coverage",
+    "items"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "evidence-manifest-v2"
+    },
+    "storyId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "coverage": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "UNKNOWN"
+      ]
+    },
+    "coverageReason": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evidenceId",
+          "type",
+          "name",
+          "availability",
+          "required",
+          "contentRef"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "type": {
+            "enum": [
+              "TB_FIELD",
+              "COMMENT",
+              "NOTE",
+              "TEXT",
+              "LOG",
+              "ARCHIVE",
+              "IMAGE",
+              "VIDEO",
+              "AUDIO",
+              "SOURCE",
+              "GIT",
+              "TEST",
+              "BUILD",
+              "DEVICE",
+              "DB",
+              "REPORT"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "availability": {
+            "enum": [
+              "AVAILABLE",
+              "PARTIAL",
+              "MISSING",
+              "FORBIDDEN",
+              "CORRUPTED",
+              "UNSUPPORTED"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "relevance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "contentRef": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 600
+          },
+          "sizeBytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-fA-F0-9]{64}$"
+          },
+          "preprocessedRefs": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 600
+            }
+          },
+          "instructionLikeContentDetected": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "coverage": {
+            "enum": [
+              "PARTIAL",
+              "UNKNOWN"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "coverageReason"
+        ],
+        "properties": {
+          "coverageReason": {
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

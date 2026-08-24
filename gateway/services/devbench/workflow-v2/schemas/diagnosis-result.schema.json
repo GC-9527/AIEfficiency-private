@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/diagnosis-result-v2.json",
+  "title": "Diagnosis Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "status",
+    "outcome",
+    "confidence",
+    "rootCause",
+    "hypotheses",
+    "plan",
+    "risks",
+    "evidenceRead",
+    "evidenceUnread",
+    "nextStage",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnosis-result-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "evidenceRead": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "receiptIds"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finding": {
+            "type": "string",
+            "maxLength": 1500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidenceUnread": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "reason"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nextStage": {
+      "enum": [
+        "PLAN_REVIEW",
+        "BLOCKED",
+        null
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "PLAN_READY",
+        "SCOPE_MISMATCH",
+        "INSUFFICIENT_EVIDENCE"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "rootCause": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "hypotheses": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": [
+          "text",
+          "status",
+          "evidenceIds"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "status": {
+            "enum": [
+              "SUPPORTED",
+              "REJECTED",
+              "UNKNOWN"
+            ]
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "plan": {
+      "type": "object",
+      "required": [
+        "planId",
+        "changes",
+        "requiredLocalChecks"
+      ],
+      "properties": {
+        "planId": {
+          "type": "string"
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "required": [
+              "rootId",
+              "path",
+              "change",
+              "reason"
+            ],
+            "properties": {
+              "rootId": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string",
+                "maxLength": 500
+              },
+              "change": {
+                "type": "string",
+                "maxLength": 1500
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "doNotChange": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "requiredLocalChecks": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "rollback": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "risks": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    }
+  }
+}

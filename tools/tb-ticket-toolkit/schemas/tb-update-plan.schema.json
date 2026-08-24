@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/tb-update-plan.schema.json",
+  "title": "TB Update Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "planId", "fingerprint", "createdAt", "expiresAt", "phase", "taskRef", "taskSnapshot", "workflowSnapshot", "proposedChanges", "evidenceRefs", "evidenceDigest", "source", "idempotencyKey", "applyAllowed", "blockers"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "planId": {"type": "string", "minLength": 1},
+    "fingerprint": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "expiresAt": {"type": "string", "format": "date-time"},
+    "phase": {"enum": ["TRIAGE", "RESOLUTION"]},
+    "taskRef": {},
+    "taskSnapshot": {"type": "object", "required": ["taskId", "taskNo", "currentStatus", "versionToken", "contextDigest"], "additionalProperties": true, "properties": {"taskId": {"type": "string", "minLength": 1}, "taskNo": {"type": "string", "minLength": 1}, "currentStatus": {"type": "object"}, "versionToken": {"type": "string"}, "contextDigest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "workflowSnapshot": {"type": "object", "required": ["projectId", "taskflowId", "workflowVersion"], "additionalProperties": true, "properties": {"projectId": {"type": "string"}, "taskflowId": {"type": ["string", "null"]}, "workflowVersion": {"type": "string"}}},
+    "proposedChanges": {"type": "object", "required": ["targetStatus", "comment", "commentHash"], "additionalProperties": false, "properties": {"targetStatus": {"type": "object"}, "comment": {"type": "string", "minLength": 1, "maxLength": 220}, "commentHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "normalizedReason": {"type": "string"},
+    "normalizedMeasure": {"type": "string"},
+    "styleChecks": {"type": "array"},
+    "evidenceRefs": {"type": "array", "minItems": 1},
+    "evidenceDigest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "source": {"type": "object"},
+    "idempotencyKey": {"type": "string", "minLength": 8},
+    "revalidated": {"type": "boolean"},
+    "applyAllowed": {"type": "boolean"},
+    "blockers": {"type": "array"}
+  }
+}

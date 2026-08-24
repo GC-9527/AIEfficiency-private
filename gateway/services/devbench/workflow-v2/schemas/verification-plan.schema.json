@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/verification-plan-v2.json",
+  "title": "Verification Plan v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "planId",
+    "profileId",
+    "status",
+    "storyIds",
+    "mandatoryCapabilities",
+    "blockers",
+    "cases"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "verification-plan-v2"
+    },
+    "planId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "profileId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "BLOCKED"
+      ]
+    },
+    "storyIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      }
+    },
+    "mandatoryCapabilities": {
+      "type": "array",
+      "maxItems": 30,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "BUILD",
+          "TEST",
+          "DEVICE_ACTION",
+          "DB_QUERY",
+          "CAPTURE"
+        ]
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 200,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "caseId",
+          "title",
+          "storyIds",
+          "mandatory",
+          "executorId",
+          "action",
+          "requirements",
+          "target",
+          "steps",
+          "assertions",
+          "evidenceRequirements",
+          "cleanup"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "storyIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "executorId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "action": {
+            "enum": [
+              "BUILD",
+              "TEST",
+              "DEVICE_ACTION",
+              "DB_QUERY",
+              "CAPTURE"
+            ]
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rootId",
+              "flavor",
+              "buildType",
+              "deviceProfileId",
+              "environment"
+            ],
+            "properties": {
+              "rootId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32
+              },
+              "flavor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "buildType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "deviceProfileId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "environment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "assertions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "evidenceRequirements": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "cleanup": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "failureDiagnostics": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "READY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "profileId": {
+            "type": "string"
+          },
+          "blockers": {
+            "maxItems": 0
+          },
+          "cases": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "BLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

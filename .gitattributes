@@ -1,0 +1,24 @@
+*.aab binary
+*.aar binary
+*.apk binary
+*.dex binary
+*.exe binary
+*.jpg binary
+*.jpeg binary
+*.mp4 binary
+*.pdf binary
+*.pftrace binary
+*.png binary
+*.pptx binary
+*.zip binary
+
+# workflow-v2 运行资产与源码锚点按 LF 检出/入库：Windows core.autocrlf 会把
+# checkout 工作树转成 CRLF，导致「与设计源字节一致」「源码锚点」类测试误报
+# （内容本身一致，差异只在行尾）。gateway/test 一并固定 LF。
+gateway/services/devbench/workflow-v2/** text eol=lf
+gateway/services/api-engine.js text eol=lf
+gateway/services/agent-runner.js text eol=lf
+gateway/services/agent-telemetry.js text eol=lf
+gateway/services/devbench/index.js text eol=lf
+gateway/services/devbench/tb-workflow.js text eol=lf
+gateway/test/** text eol=lf

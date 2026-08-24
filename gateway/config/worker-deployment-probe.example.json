@@ -1,0 +1,70 @@
+{
+  "schema": "devbench.worker-deployment-probe-config.v5",
+  "version": 5,
+  "generation": 1,
+  "stories": {
+    "<STORY_ID>": {
+      "cwd": "<ABSOLUTE_STORY_REPOSITORY_PATH>",
+      "allowedRoots": [
+        "<ABSOLUTE_STORY_REPOSITORY_PATH>"
+      ],
+      "writeDeniedRoots": [
+        "<ABSOLUTE_BASE_REPOSITORY_PATH>"
+      ],
+      "inaccessibleRoots": [
+        "<ABSOLUTE_BASE_GIT_DIR_PATH>",
+        "<ABSOLUTE_CONTROLLER_MIRROR_PATH>",
+        "<ABSOLUTE_OTHER_STORY_REPOSITORY_PATH>",
+        "<ABSOLUTE_GATEWAY_SECRET_PATH>"
+      ],
+      "inaccessibleEntries": [
+        {
+          "root": "<ABSOLUTE_BASE_GIT_DIR_PATH>",
+          "path": "<ABSOLUTE_BASE_GIT_DIR_PATH>",
+          "type": "directory"
+        },
+        {
+          "root": "<ABSOLUTE_CONTROLLER_MIRROR_PATH>",
+          "path": "<ABSOLUTE_CONTROLLER_MIRROR_PATH>",
+          "type": "directory"
+        },
+        {
+          "root": "<ABSOLUTE_GATEWAY_SECRET_PATH>",
+          "path": "<ABSOLUTE_GATEWAY_SECRET_PATH>",
+          "type": "file"
+        },
+        {
+          "root": "<ABSOLUTE_OTHER_STORY_REPOSITORY_PATH>",
+          "path": "<ABSOLUTE_OTHER_STORY_REPOSITORY_PATH>",
+          "type": "directory"
+        }
+      ],
+      "boundarySentinels": [
+        {
+          "deniedRoot": "<ABSOLUTE_BASE_REPOSITORY_PATH>",
+          "sentinelPath": "<ABSOLUTE_BASE_PARENT_PATH>/.devbench-worker-boundary-base.sentinel"
+        },
+        {
+          "deniedRoot": "<ABSOLUTE_OTHER_STORY_REPOSITORY_PATH>",
+          "sentinelPath": "<ABSOLUTE_OTHER_STORY_PARENT_PATH>/.devbench-worker-boundary-other-story.sentinel"
+        },
+        {
+          "deniedRoot": "<ABSOLUTE_CONTROLLER_MIRROR_PATH>",
+          "sentinelPath": "<ABSOLUTE_MIRROR_PARENT_PATH>/.devbench-worker-boundary-mirror.sentinel"
+        },
+        {
+          "deniedRoot": "<ABSOLUTE_BASE_GIT_DIR_PATH>",
+          "sentinelPath": "<ABSOLUTE_BASE_REPOSITORY_PATH>/.devbench-worker-boundary-base-git.sentinel"
+        },
+        {
+          "deniedRoot": "<ABSOLUTE_GATEWAY_SECRET_PATH>",
+          "sentinelPath": "<ABSOLUTE_GATEWAY_PARENT_PATH>/.devbench-worker-boundary-gateway-secret.sentinel"
+        }
+      ],
+      "aclFingerprints": [
+        "<CONTROLLER_PROVISION_RESULT_64_LOWERCASE_HEX_ACL_FINGERPRINT>"
+      ],
+      "workerIdentity": "<CONTROLLER_POLICY_STORY_WORKER_SID_OR_UID>"
+    }
+  }
+}

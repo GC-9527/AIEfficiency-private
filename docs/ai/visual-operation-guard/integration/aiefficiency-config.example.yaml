@@ -1,0 +1,44 @@
+visualOperationGuard:
+  enabled: true
+  serviceUrl: http://127.0.0.1:18081
+  apiKeyEnv: AIEVOG_API_KEY
+  failurePolicy:
+    structuredReadOnly: fail_open
+    structuredWrite: fail_closed
+    screenshot: fail_closed
+    visualAction: fail_closed
+    sensitiveAction: fail_closed
+  enforcementByTaskType:
+    story_fix: hard
+    story_feature: hard
+    project_acceptance: hard
+    workflow_exploration: soft
+    migration_shadow: shadow
+  modeByTaskType:
+    story_fix: balanced
+    story_feature: balanced
+    project_acceptance: acceptance
+    workflow_exploration: exploration
+    unattended_story: unattended
+    ci: strict_ci
+  humanHandoff:
+    saveCheckpoint: true
+    notifyChannels: [dingtalk]
+    releaseLocks: [device, repository, worktree]
+    resumeFromCheckpoint: true
+  authorization:
+    startTtlSeconds: 60
+    resultTtlSeconds: 3600
+    resultReplayTtlSeconds: 86400
+    maxPendingPerTask: 4
+    maxActivePerTask: 4
+    maxCompletedPerTask: 32
+    failClosedOnBeginError: true
+  operationMap:
+    path: .ai/operation-map.json
+    requireVersion: true
+    recordStrategyResult: true
+  audit:
+    includeScreenshotBytes: false
+    includeScreenFingerprint: true
+    redactSecrets: true

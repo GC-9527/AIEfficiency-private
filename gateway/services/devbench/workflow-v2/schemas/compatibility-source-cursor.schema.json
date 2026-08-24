@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/compatibility-source-cursor-v1.json",
+  "title": "Workflow v2 Compatibility Source Cursor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "storyId",
+    "checkpoint",
+    "evidenceManifest",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "workflow-v2-compatibility-source-cursor-v1" },
+    "storyId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "checkpoint": { "$ref": "#/$defs/source" },
+    "evidenceManifest": { "$ref": "#/$defs/source" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "envelopeSha256", "payloadSha256"],
+      "properties": {
+        "revision": { "type": "integer", "minimum": 1 },
+        "envelopeSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "payloadSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

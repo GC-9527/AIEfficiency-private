@@ -1,0 +1,33 @@
+{
+  "definitions": [
+    {
+      "logicalDefinitionId": "aiefficiency",
+      "displayName": "AIEfficiency",
+      "basePath": "<ABSOLUTE_PROTECTED_BASE_REPOSITORY_PATH>",
+      "remoteId": "origin",
+      "expectedRemoteUrls": [
+        "git@codeup.aliyun.com:xunihezi/AIEfficiency.git"
+      ],
+      "credentialRef": "codeup-readonly",
+      "allowedBranches": [
+        "main"
+      ],
+      "publicationPolicy": {
+        "schemaVersion": 1,
+        "mode": "PROTECTED_EXACT_SHA_POSITIVE_LEDGER",
+        "evidenceId": "release-ledger:aiefficiency",
+        "publishedCommitShas": []
+      },
+      "baseSyncPolicy": {
+        "requireClean": true,
+        "fastForwardOnly": true,
+        "allowCheckout": false,
+        "allowAutomaticStash": false,
+        "allowMergeCommit": false,
+        "allowRemoteRewind": false,
+        "autoApplyWhenClean": false
+      },
+      "isolationMode": "separate-worker-identity"
+    }
+  ]
+}

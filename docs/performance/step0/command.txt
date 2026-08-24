@@ -1,0 +1,8 @@
+adb shell "monkey -p com.appmarket.automotive --throttle 300 --ignore-crashes --ignore-timeouts --ignore-security-exceptions --ignore-native-crashes --monitor-native-crashes  --pct-touch 75 --pct-trackball 5 --pct-syskeys 0 --pct-nav 0 --pct-majornav 0 --pct-appswitch 15 --pct-flip 0 --pct-anyevent 0 --pct-pinchzoom 5 --pct-permission 0 -v -v 99999999 >/data/local/tmp/20260529monkey_log.txt"
+
+adb connect 192.168.20.116:5566
+
+adb install D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV5\sample\app-market\build\outputs\apk\avatr8678Dev\release\AppMarket-1.0.6-10006-avatr8678Dev-release.apk
+
+
+你目前的脚本与 “adb shell "monkey -p com.appmarket.automotive --throttle 300 --ignore-crashes --ignore-timeouts --ignore-security-exceptions --ignore-native-crashes --monitor-native-crashes  --pct-touch 75 --pct-trackball 5 --pct-syskeys 0 --pct-nav 0 --pct-majornav 0 --pct-appswitch 15 --pct-flip 0 --pct-anyevent 0 --pct-pinchzoom 5 --pct-permission 0 -v -v 99999999 >/data/local/tmp/20260529monkey_log.txt"” 一样吗我想跑你的脚本来测试性能

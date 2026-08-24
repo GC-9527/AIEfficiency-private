@@ -1,0 +1,15 @@
+为什么单元测试，测试用例等自测你测不出来下面的问题？给出解决方案，以后这种跨多端的代码如何做测试？比如我不专业就不知道名词集成测试，你AI也不提醒我，我只知道单元测试与测试用例，mock等
+还有集成测试或者其他的方案来解决这种跨多端的自测，模拟测试吗？
+
+d = msg.data || {} —— 前端只认 msg.data。但我注意到 git update 的 WS emit（之前看到的 push）似乎是 broadcastAll({ type, tabId, ... })（对象、未 stringify、无 data 包裹）。若属实，git_update 的 WS 根本到不了前端 →
+  这正是浮窗"永显"的更深根因（只剩 HTTP 兜底且无定时器）。核实一下：
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+● 确认了 —— 更深的根因在后端 :2782：
+
+  const push = (payload) => { try { broadcastAll({ type: "devbench_git_update", tabId, ...payload }); } catch {} };
+
+  这里把对象直接传给 broadcastAll（它只 client.send(wsMessage)，传对象会抛 Buffer.from 异常被 catch 吞掉 → 啥也没发），而且没有 data 包裹（前端是 d = msg.data）。所以 git_update 的 WS 进度/end 从来没到过前端，只剩 HTTP 兜底 →
+  既无实时阶段进度、又因兜底无定时器而"永显"。这是双重 bug。我顺手修正它（和本文件其它正常 emit 一致）：
+

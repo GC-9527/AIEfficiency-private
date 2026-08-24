@@ -1,0 +1,107 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.15.4
+    container_name: knowledge-qdrant
+    restart: unless-stopped
+    networks: [kb_net]
+    ports:
+      - "127.0.0.1:${QDRANT_HOST_PORT:-6333}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  ollama:
+    image: ollama/ollama:0.11.4
+    container_name: knowledge-ollama
+    restart: unless-stopped
+    networks: [kb_net]
+    ports:
+      - "127.0.0.1:${OLLAMA_HOST_PORT:-11434}:11434"
+    environment:
+      OLLAMA_KEEP_ALIVE: 24h
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-init:
+    image: ollama/ollama:0.11.4
+    container_name: knowledge-ollama-init
+    profiles: ["init"]
+    networks: [kb_net]
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        until ollama list >/dev/null 2>&1; do echo "Waiting for Ollama..."; sleep 3; done
+        ollama pull "$${OLLAMA_EMBED_MODEL}"
+
+  rag-search:
+    build:
+      context: ./rag-search
+    image: knowledge-rag-search:local
+    container_name: knowledge-rag-search
+    restart: unless-stopped
+    networks: [kb_net]
+    ports:
+      - "127.0.0.1:${RAG_SEARCH_HOST_PORT:-3001}:3001"
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      OLLAMA_URL: http://ollama:11434
+      COLLECTION_NAME: ${COLLECTION_NAME:-music_knowledge}
+      OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
+    depends_on:
+      - qdrant
+      - ollama
+
+  kb-importer:
+    build:
+      context: ./importer
+    image: knowledge-importer:local
+    container_name: knowledge-importer
+    profiles: ["init"]
+    networks: [kb_net]
+    depends_on:
+      - qdrant
+      - ollama
+    environment:
+      QDRANT_URL_OVERRIDE: http://qdrant:6333
+      OLLAMA_URL_OVERRIDE: http://ollama:11434/api/embeddings
+      CSV_PATH_OVERRIDE: /work/data/${CSV_FILE_NAME:-merged_songs_deduped_clean_utf8.csv}
+      COLLECTION_NAME_OVERRIDE: ${COLLECTION_NAME:-music_knowledge}
+      EMBED_MODEL_OVERRIDE: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
+      VECTOR_DIM_OVERRIDE: ${VECTOR_DIM:-768}
+    volumes:
+      - ./importer/data:/work/data:ro
+    restart: "no"
+
+  caddy:
+    image: caddy:2.10.2-alpine
+    container_name: knowledge-caddy
+    restart: unless-stopped
+    networks: [kb_net]
+    depends_on:
+      - rag-search
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+networks:
+  kb_net:
+    driver: bridge
+
+volumes:
+  qdrant_data:
+  ollama_data:
+  caddy_data:
+  caddy_config:

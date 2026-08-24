@@ -1,0 +1,413 @@
+{
+  "$schema": "./quality-gate.schema.json",
+  "version": 1,
+  "project": {
+    "name": "AIEfficiency",
+    "frontendRoot": "web-dashboard",
+    "backendRoots": [
+      "gateway"
+    ],
+    "sourceRoots": [
+      "web-dashboard/src",
+      "gateway"
+    ],
+    "outputRoot": ".aiefficiency/quality",
+    "importAliases": {
+      "@/": "web-dashboard/src/",
+      "~/": "web-dashboard/src/",
+      "src/": "web-dashboard/src/"
+    }
+  },
+  "git": {
+    "defaultBase": "HEAD",
+    "includeUntracked": true,
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      ".aiefficiency/quality/**",
+      ".agents/skills/aiefficiency-fullstack-quality/**",
+      ".claude/skills/aiefficiency-fullstack-quality/**",
+      ".gemini/skills/aiefficiency-fullstack-quality/**",
+      ".opencode/skills/aiefficiency-fullstack-quality/**",
+      ".aiefficiency/skill-backups/**",
+      ".agents/skills/.backups/**",
+      ".claude/skills/.backups/**",
+      ".gemini/skills/.backups/**",
+      ".opencode/skills/.backups/**",
+      ".git/**"
+    ]
+  },
+  "risk": {
+    "deepPatterns": [
+      "web-dashboard/src/App.*",
+      "web-dashboard/src/main.*",
+      "web-dashboard/src/index.css",
+      "web-dashboard/src/components/FloatingDock.*",
+      "**/*Dialog*.*",
+      "**/*Modal*.*",
+      "**/*Drawer*.*",
+      "**/services/gateway.*",
+      "**/services/*Auth*.*",
+      "gateway/**/migrations/**",
+      "gateway/**/auth/**",
+      "gateway/**/executor/**"
+    ],
+    "sharedUiPatterns": [
+      "web-dashboard/src/App.*",
+      "web-dashboard/src/main.*",
+      "web-dashboard/src/index.css",
+      "web-dashboard/src/styles/**",
+      "web-dashboard/tailwind.config.*",
+      "web-dashboard/src/components/FloatingDock.*",
+      "web-dashboard/src/components/Sidebar*.*",
+      "web-dashboard/src/components/layout/**",
+      "web-dashboard/src/components/ui/**",
+      "web-dashboard/src/components/common/**",
+      "web-dashboard/src/components/shared/**"
+    ],
+    "largeFileLines": 1000,
+    "globalContractPatterns": [
+      "web-dashboard/src/services/gateway.*",
+      "web-dashboard/src/services/*Auth*.*",
+      "web-dashboard/src/services/http*.*",
+      "gateway/**/auth/**",
+      "gateway/**/executor/**"
+    ]
+  },
+  "routes": [
+    {
+      "name": "devbench",
+      "path": "/devbench",
+      "entryPatterns": [
+        "web-dashboard/src/pages/devbench/**"
+      ],
+      "siblings": [
+        "aiautowork",
+        "settings"
+      ]
+    },
+    {
+      "name": "aiautowork",
+      "path": "/aiautowork",
+      "entryPatterns": [
+        "web-dashboard/src/pages/aiautowork/**"
+      ],
+      "siblings": [
+        "devbench",
+        "aiautowork-settings"
+      ]
+    },
+    {
+      "name": "aiautowork-settings",
+      "path": "/aiautowork/settings",
+      "entryPatterns": [
+        "web-dashboard/src/pages/aiautowork/**/Settings*",
+        "web-dashboard/src/pages/aiautowork/**"
+      ],
+      "siblings": [
+        "aiautowork",
+        "settings"
+      ]
+    },
+    {
+      "name": "settings",
+      "path": "/settings",
+      "entryPatterns": [
+        "web-dashboard/src/pages/Settings.*",
+        "web-dashboard/src/pages/settings/**"
+      ],
+      "siblings": [
+        "aiautowork-settings",
+        "devices"
+      ]
+    },
+    {
+      "name": "devices",
+      "path": "/devices",
+      "entryPatterns": [
+        "web-dashboard/src/pages/Devices.*",
+        "web-dashboard/src/pages/devices/**"
+      ],
+      "siblings": [
+        "settings",
+        "admin"
+      ]
+    },
+    {
+      "name": "admin",
+      "path": "/admin",
+      "entryPatterns": [
+        "web-dashboard/src/pages/AdminPlatform.*",
+        "web-dashboard/src/pages/admin/**"
+      ],
+      "siblings": [
+        "devices",
+        "settings"
+      ]
+    }
+  ],
+  "commands": {
+    "quick": [
+      {
+        "name": "web-build",
+        "cwd": ".",
+        "command": "npm --prefix web-dashboard run build",
+        "whenAny": [
+          "web-dashboard/**"
+        ],
+        "timeoutMs": 180000
+      }
+    ],
+    "standard": [
+      {
+        "name": "web-tests",
+        "cwd": ".",
+        "command": "npm --prefix web-dashboard test",
+        "whenAny": [
+          "web-dashboard/**"
+        ],
+        "timeoutMs": 300000
+      },
+      {
+        "name": "web-build",
+        "cwd": ".",
+        "command": "npm --prefix web-dashboard run build",
+        "whenAny": [
+          "web-dashboard/**"
+        ],
+        "timeoutMs": 180000
+      },
+      {
+        "name": "gateway-tests",
+        "cwd": ".",
+        "command": "npm --prefix gateway test",
+        "whenAny": [
+          "gateway/**"
+        ],
+        "timeoutMs": 600000
+      }
+    ],
+    "deep": [
+      {
+        "name": "web-tests",
+        "cwd": ".",
+        "command": "npm --prefix web-dashboard test",
+        "whenAny": [
+          "web-dashboard/**",
+          "gateway/**"
+        ],
+        "timeoutMs": 300000
+      },
+      {
+        "name": "web-build",
+        "cwd": ".",
+        "command": "npm --prefix web-dashboard run build",
+        "whenAny": [
+          "web-dashboard/**",
+          "gateway/**"
+        ],
+        "timeoutMs": 180000
+      },
+      {
+        "name": "gateway-tests",
+        "cwd": ".",
+        "command": "npm --prefix gateway test",
+        "whenAny": [
+          "gateway/**",
+          "web-dashboard/src/services/**"
+        ],
+        "timeoutMs": 600000
+      }
+    ]
+  },
+  "staticAudit": {
+    "failOnIntroducedSeverities": [
+      "P0",
+      "P1"
+    ],
+    "maxArbitraryZIndex": 120,
+    "hardWidthWarningPx": 480,
+    "hardHeightWarningPx": 720,
+    "pollingWarningMs": 5000,
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "**/*.test.*",
+      "**/__tests__/**",
+      "**/fixtures/**"
+    ]
+  },
+  "bundle": {
+    "dist": "web-dashboard/dist",
+    "baselineFile": ".aiefficiency/quality/baselines/bundle.json",
+    "maxTotalJsGzipGrowthPercent": 10,
+    "maxTotalJsGzipGrowthBytes": 102400,
+    "maxTotalCssGzipGrowthPercent": 10,
+    "maxSingleJsGzipBytes": 768000,
+    "failWithoutBaseline": false
+  },
+  "browser": {
+    "enabled": true,
+    "baseUrl": "http://127.0.0.1:3000",
+    "healthPath": "/",
+    "navigationTimeoutMs": 30000,
+    "settleMs": 1200,
+    "requireServerInDeep": false,
+    "executablePath": "",
+    "headless": true,
+    "ignoreHTTPSErrors": true,
+    "primaryViewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "viewports": {
+      "quick": [
+        {
+          "width": 1440,
+          "height": 900
+        }
+      ],
+      "standard": [
+        {
+          "width": 1024,
+          "height": 768
+        },
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ],
+      "deep": [
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1024,
+          "height": 768
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    "routeSelection": {
+      "quickMax": 2,
+      "standardIncludeSiblings": true,
+      "deepAllCriticalRoutes": true
+    },
+    "commonScenarios": [
+      {
+        "name": "default",
+        "modes": [
+          "quick",
+          "standard",
+          "deep"
+        ],
+        "actions": []
+      },
+      {
+        "name": "sidebar-collapsed",
+        "modes": [
+          "standard",
+          "deep"
+        ],
+        "routeNames": [
+          "devbench",
+          "aiautowork",
+          "settings"
+        ],
+        "actions": [
+          {
+            "type": "click",
+            "selector": "button[aria-label='向左收起侧栏']",
+            "optional": true
+          },
+          {
+            "type": "wait",
+            "ms": 350
+          }
+        ]
+      },
+      {
+        "name": "dock-collapsed",
+        "modes": [
+          "deep"
+        ],
+        "routeNames": [
+          "devbench",
+          "aiautowork"
+        ],
+        "actions": [
+          {
+            "type": "click",
+            "selector": "#floating-dock button[title='收起到右侧']",
+            "optional": true
+          },
+          {
+            "type": "wait",
+            "ms": 250
+          }
+        ]
+      }
+    ],
+    "criticalSelectors": [
+      "[data-ui-critical]",
+      "[data-ui-region='story-composer']",
+      "[role='dialog']",
+      "[aria-modal='true']"
+    ],
+    "ignoreSelectors": [
+      "[data-ui-audit-ignore]",
+      "[aria-hidden='true']"
+    ],
+    "maskSelectors": [
+      "[data-ui-dynamic]"
+    ],
+    "loadingSelectors": [
+      "[data-loading='true']",
+      "[aria-busy='true']"
+    ],
+    "networkIgnorePatterns": [
+      "favicon.ico"
+    ],
+    "visual": {
+      "enabled": true,
+      "baselineDir": ".aiefficiency/quality/baselines/screenshots",
+      "currentDir": ".aiefficiency/quality/screenshots/current",
+      "diffDir": ".aiefficiency/quality/screenshots/diff",
+      "maxDifferentPixelRatio": 0.005,
+      "channelTolerance": 24,
+      "failWithoutBaseline": false
+    },
+    "budgets": {
+      "lcpMs": 2500,
+      "cls": 0.1,
+      "loadMs": 5000,
+      "longTaskCount": 8,
+      "transferBytes": 8388608,
+      "resourceCount": 300
+    }
+  },
+  "report": {
+    "keepRuns": 20,
+    "writeLatest": true
+  }
+}

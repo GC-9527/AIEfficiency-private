@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/repair-result-v2.json",
+  "title": "Repair Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "idempotencyKey",
+    "status",
+    "outcome",
+    "rootCause",
+    "changes",
+    "localChecks",
+    "risks",
+    "remaining",
+    "userFriendlyCause",
+    "userFriendlyMeasure",
+    "changeSummary",
+    "evidenceRead",
+    "evidenceUnread",
+    "nextStage",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "repair-result-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "evidenceRead": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "receiptIds"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finding": {
+            "type": "string",
+            "maxLength": 1500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidenceUnread": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "reason"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nextStage": {
+      "enum": [
+        "LOCAL_GATE",
+        "BLOCKED",
+        "TRIAGE",
+        null
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "FIXED",
+        "NOT_FIXED",
+        "SCOPE_MISMATCH",
+        "NO_CHANGE_REQUIRED"
+      ]
+    },
+    "rootCause": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "changes": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "rootId",
+          "path",
+          "summary",
+          "receiptIds"
+        ],
+        "properties": {
+          "rootId": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "localChecks": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "receiptIds"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED",
+              "NOT_RUN"
+            ]
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "risks": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "remaining": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "userFriendlyCause": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "userFriendlyMeasure": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "changeSummary": {
+      "type": "string",
+      "maxLength": 300
+    }
+  }
+}

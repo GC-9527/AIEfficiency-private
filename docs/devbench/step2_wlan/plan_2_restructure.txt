@@ -1,0 +1,105 @@
+================================================================================
+【迁移方案 C2】物理重构：server / client(web+desktop+node-agent) / shared
+分支：建议单开 feat/restructure-c2（从 feat/lan-distributed-agent 拉出）
+原则：分阶段、每阶段可构建可运行、每阶段验证；绝不一把梭。
+================================================================================
+
+────────────────────────────────────────────────
+〇、先认清现实（决定工作量）
+────────────────────────────────────────────────
+当前 gateway 模块归类：
+  · 服务端专属(server-only)：极少
+      routes: claude-proxy.js, distributed.js
+      services: claude-proxy.js
+      (未来) admin 后台：账号/配置管理（尚未开发，才是 server 的真正份量）
+  · 节点专属(node-only，=本地执行/工具/开发)：绝大多数
+      routes: devbench, devices, cardev, executor, tasks, performance, driveeats,
+              clipboard, schedule, report, tb-tasks, dingtalk, workflows, chat, skills, logs
+      services: executor, device-discovery, agent-runner(本地跑CLI), scheduler,
+              output-adapters, feishu, network-diagnose, workflow-executor, dag-scheduler,
+              capability-doc, task-decomposer, platform-context, log-archiver,
+              report-generator, tb-*, devbench/*, cardev/*, bug-agent/*
+      资源: skills/, configs/, features/, templates/, knowledge/
+  · 共享基础设施(shared，两边都要)：较大
+      services: config, logger, dispatcher, api-engine, api-tools, remote-tools,
+              context-manager, teambition；  db/(sqlite)
+
+结论：真拆后 server 很瘦（proxy+distributed+共享），node-agent 几乎=现 gateway。
+      admin 后台是 server 的真正重头，但还没开发。
+
+────────────────────────────────────────────────
+一、目标结构
+────────────────────────────────────────────────
+shared/                 # 共享后端基础设施（被 server 与 node-agent 复用）
+   config.js logger.js db/ dispatcher.js api-engine.js api-tools.js
+   remote-tools.js context-manager.js teambition.js  (+ package.json)
+server/                 # 服务端（专门部署：Claude 能力 + 编排 + 未来 admin）
+   server.js            # 只挂 server 角色路由
+   routes/  claude-proxy.js  distributed.js  (admin/*)
+   services/claude-proxy.js
+   package.json
+client/
+   node-agent/          # 本地 ai agent（被 server 驱动 + 本地开发执行）
+      server.js         # 只挂 node 角色路由
+      routes/  executor devbench devices cardev tasks performance ...
+      services/ executor agent-runner devbench/* cardev/* bug-agent/* ...
+      package.json
+   web/                 # 原 web-dashboard（web 客户端）
+   desktop/             # 原 desktop（Electron；内置 node-agent + web 构建）
+shared-assets/          # skills/ configs/ features/ templates/（运行期资源；名字待定，避免与 shared/ 混）
+cloud/  docs/  deploy/  tools/  demo/  mcp-servers/
+
+共享层做法（ESM）：用 npm workspaces 或相对导入。推荐 workspaces：
+  根 package.json: { "workspaces": ["shared","server","client/node-agent","client/web"] }
+  server / node-agent 用 "@app/shared" 包名导入共享模块（需给 shared 起包名）。
+  —— 这是 C2 真正的工程量：把 gateway 内大量 import 改成跨包导入。
+
+────────────────────────────────────────────────
+二、影响清单（搬动会断的，全部要改）
+────────────────────────────────────────────────
+1) gateway 内相对路径深度：
+   - agent-runner.js / context-manager.js: PROJECT_ROOT = join(__dirname,"..","..")
+   - bug-agent: GATEWAY_ROOT = "../../.."
+   - skills/configs 解析: join(PROJECT_ROOT,"skills") 等
+   → 拆分后每个后端的 __dirname 深度变了 + skills/configs 变成 shared-assets/，全要重算。
+2) 跨模块导入：node-only 与 server-only 都 import 共享(config/logger/db/...)
+   → 改为跨包(@app/shared)或新相对路径。涉及几乎所有 services/routes 文件。
+3) db/sqlite：server 与 node-agent 各自一份 DB？还是共用？需定（建议各自独立 DB 文件）。
+4) desktop 打包(关键)：
+   - prepare-gateway.js 复制 ../gateway → 改为复制 client/node-agent(+shared)
+   - package.json: build-web=../web-dashboard、extraResources ../web-dashboard/dist /../skills /../configs
+     → 全改为 client/web、shared-assets 等新路径
+   - 桌面内置的是 node-agent（不是 server）
+5) start/stop 脚本(scripts/, 根)、deploy/、cloud/server.js：按新路径与「分角色起服务」改写。
+6) skip-worktree 的本地端口改动(start*, vite.config) 要先处理，避免丢。
+7) 配置：config 的 role 概念（server/node）、各自端口（server 默认?、node 3001）。
+8) CLAUDE.md 全量更新结构与启动说明。
+
+────────────────────────────────────────────────
+三、分阶段执行（每阶段结束都要能跑+能打包）
+────────────────────────────────────────────────
+S0 准备：单开分支 feat/restructure-c2；处理 skip-worktree 文件；记录基线（dev 能跑、桌面能打）。
+S1 抽 shared：把共享基础设施移到 shared/，起包名，配 workspaces；
+   gateway(暂留原位)改为从 @app/shared 导入。验证 dev gateway 起得来。
+S2 立 node-agent：把 node-only routes/services 迁到 client/node-agent/，server.js 只挂 node 路由；
+   修 PROJECT_ROOT 深度 + 资源指向 shared-assets/。验证 node-agent 单独能跑(devbench/executor/devices)。
+S3 立 server：server-only(claude-proxy/distributed) 迁到 server/，server.js 只挂 server 路由。
+   验证 server 单独能跑(/api/claude-proxy /api/distributed)。
+S4 web：web-dashboard → client/web；改前端 gateway URL 适配(指向 node-agent / server)。
+S5 desktop：desktop → client/desktop；改 prepare-gateway 复制 node-agent+shared、extraResources 路径；
+   重打一个安装包验证启动正常。
+S6 资源与脚本：skills/configs/features/templates → shared-assets/；改 start/stop/deploy/cloud；
+   云端分发脚本与 bundle 路径更新。
+S7 收尾：更新 CLAUDE.md/README；删除旧 gateway 目录；全量回归(dev 双角色 + 桌面包 + 云端)。
+
+每阶段一个提交，便于回退。任何阶段验证不过就停下修。
+
+────────────────────────────────────────────────
+四、风险与务实建议
+────────────────────────────────────────────────
+- 最大风险：桌面打包与云端部署（刚反复调好）；跨包导入面极广(几乎每个文件)。
+- 现实：server 端目前很瘦，admin 后台未开发 —— C2 此刻投入大、server 侧收益小。
+- 仍按你定的 C2 做；但强烈建议：S1+S2+S3（后端三分）先做透并各自验证，
+  S4/S5（web/desktop 搬动 + 打包）单独小心做，避免一轮把打包搞坏。
+- 若中途觉得成本过高，可在 S3 后暂停：此时已是「shared + server + node-agent」三后端，
+  web/desktop 可暂留原位仅改引用，渐进完成 S4/S5。

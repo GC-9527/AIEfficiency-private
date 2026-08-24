@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/expert-report-result-v2.json",
+  "title": "Expert Report Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "idempotencyKey",
+    "status",
+    "htmlRef",
+    "usedEvidenceIds",
+    "usedAssetIds",
+    "warnings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "expert-report-result-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "htmlRef": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 600
+    },
+    "usedEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "usedAssetIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  }
+}

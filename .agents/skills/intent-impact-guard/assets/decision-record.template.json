@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "task_id": "TASK-ID",
+  "phase": "PREWRITE",
+  "repository": {
+    "root": "",
+    "branch": "",
+    "head": "",
+    "dirty": false,
+    "dirty_patch_hash": "",
+    "variant_or_flavor": ""
+  },
+  "request": {
+    "problem_signal": "",
+    "business_goal": "",
+    "explicit_solution": "",
+    "non_goals": [],
+    "unknowns": []
+  },
+  "evidence": [
+    {
+      "status": "VERIFIED",
+      "kind": "code",
+      "path": "",
+      "locator": "",
+      "finding": ""
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-1",
+      "statement": "",
+      "source": "",
+      "verification": "",
+      "result": "PENDING"
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "summary": "",
+      "risk": "LOW",
+      "reversible": true,
+      "goal_fit": "",
+      "impact": "",
+      "rejected_reason": ""
+    },
+    {
+      "id": "B",
+      "summary": "",
+      "risk": "HIGH",
+      "reversible": false,
+      "goal_fit": "",
+      "impact": "",
+      "rejected_reason": ""
+    }
+  ],
+  "decision": {
+    "selected_option_id": "A",
+    "reason": "",
+    "risk": "LOW",
+    "permission": "LOCAL_WRITE",
+    "explicit_authorization": false,
+    "status": "READY"
+  },
+  "change_budget": {
+    "allowed_modules": [],
+    "allowed_files": [],
+    "forbidden_paths": [],
+    "max_files": 0,
+    "allow_new_dependency": false,
+    "allow_delete": false,
+    "allow_public_contract_change": false,
+    "scope_expansion_approved": false
+  },
+  "forbidden_outcomes_detected": [],
+  "verification": {
+    "planned": [],
+    "executed": [],
+    "status": "PENDING"
+  },
+  "actual": {
+    "changed_files": [],
+    "scope_deviation": ""
+  },
+  "result": "PENDING"
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "risk_levels": [
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL"
+  ],
+  "permissions": [
+    "READ_ONLY",
+    "LOCAL_WRITE",
+    "EXTERNAL_WRITE",
+    "DESTRUCTIVE"
+  ],
+  "minimum_verified_evidence": {
+    "LOW": 1,
+    "MEDIUM": 2,
+    "HIGH": 3,
+    "CRITICAL": 3
+  },
+  "minimum_options": 2,
+  "high_risk_requires_explicit_authorization": true,
+  "external_write_requires_explicit_authorization": true,
+  "destructive_requires_explicit_authorization": true,
+  "require_invariants": true,
+  "require_change_budget": true,
+  "require_target_verification": true,
+  "forbidden_outcomes_must_be_empty": true,
+  "postwrite_scope_must_match_budget": true
+}

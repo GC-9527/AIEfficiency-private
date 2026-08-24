@@ -1,0 +1,38 @@
+车型码 Geely P177
+
+CC01=92 代表P177的车型
+
+主屏 Geely P177
+副屏 Geely P177=2
+后排屏 Geely P177=3
+
+displayid 1001 主屏 Geely P177
+displayid 1002 副屏 Geely P177=2
+displayid 1003 后排屏 Geely P177=3
+
+display id
+1001 CSD
+1002 PSD
+1003 大长屏
+3 rsd
+
+192.168.10.110:7897
+
+adb shell settings put global http_proxy 192.168.10.110:7897
+
+adb shell settings put global http_proxy 192.168.10.49:7890
+
+"String code = SystemPropertiesUtils.getStringValueByKey(""persist.sys.country"", """");
+返回值取值范围：97、179、71，对应的国家是科威特、沙特、俄罗斯"
+
+adb命令 如何设置 persist.sys.country 值为 16进制 “B2” 对应的值 把最终的adb命令发给我
+
+• 0xB2 对应十进制 178，设置命令：
+
+  adb -s 192.168.20.224:5566 shell su 0 setprop persist.sys.country 178
+
+  验证：
+
+  adb -s 192.168.20.224:5566 shell getprop persist.sys.country
+
+  已经给 车机设置了代理 192.168.10.110:7897 但似乎没有生效 帮我检查是否生效 我是通过设置的本地电脑 clash verge

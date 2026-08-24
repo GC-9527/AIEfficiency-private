@@ -1,0 +1,34 @@
+{
+  "name": "ai-efficiency-dashboard",
+  "version": "1.0.0",
+  "description": "AI工作提效 - Web管理面板",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "pretest": "node --test src/services/adminAuth.test.mjs src/services/adminAuthArchitecture.test.mjs src/pages/writeAuthTransport.test.mjs src/pages/aiautowork/acceptanceModel.test.mjs src/pages/settings/lanSyncAutomaticUi.test.mjs src/pages/settings/settingsPerformanceUi.test.mjs src/pages/devbench/vehicleSourceManualSyncUi.test.mjs",
+    "test": "node --test src/services/gateway.test.mjs src/pages/settings/tbCookieLoginModel.test.mjs src/pages/settings/atlasSetupModel.test.mjs src/pages/feishuProjectSyncLoadModel.test.mjs src/pages/feishuProjectSyncRefreshResult.test.mjs src/pages/feishuProjectSyncSourceViews.test.mjs src/pages/feishuProjectSyncPolicyModel.test.mjs src/pages/feishuProjectSyncReadableUi.test.mjs src/pages/cardev/engineeringModeDeviceSelection.test.mjs src/App.sidebarNav.test.mjs src/App.defaultRoute.test.mjs src/App.devbenchKeepAlive.test.mjs src/pages/devbench/artifactPathModel.test.mjs src/pages/devbench/chatStopModel.test.mjs src/pages/devbench/conversation/conversationGraphModel.test.mjs src/pages/devbench/closedStoryPurgeApi.test.mjs src/pages/devbench/devbenchRootOverflow.test.mjs src/pages/devbench/configInferenceReviewModel.test.mjs src/pages/devbench/aiTrainingGovernanceModel.test.mjs src/pages/devbench/aiTrainingGovernanceApi.test.mjs src/pages/devbench/gitCommitStoryModel.test.mjs src/pages/devbench/newStoryPanelModel.test.mjs src/pages/devbench/projectConfigCache.test.mjs src/pages/devbench/projectControlsFloatingModel.test.mjs src/pages/devbench/storyAttachmentModel.test.mjs src/pages/devbench/storyAttachmentUpload.test.mjs src/pages/devbench/storyInputDraftModel.test.mjs src/pages/devbench/storyMessageModel.test.mjs src/pages/devbench/storyMessageSendModel.test.mjs src/pages/devbench/storyEntryInferenceModel.test.mjs src/pages/devbench/storyInitializationModel.test.mjs src/pages/devbench/storyTitleModel.test.mjs src/pages/devbench/storyWorktreeBannerTheme.test.mjs src/pages/devbench/tbProjectSelectionModel.test.mjs src/pages/devbench/storyRunStatusModel.test.mjs src/pages/devbench/storyScrollModel.test.mjs src/pages/devbench/summaryOptionsModel.test.mjs src/pages/devbench/summaryRangeModel.test.mjs src/pages/devbench/vehicleSourceAdminState.test.mjs src/pages/devbench/workflowMapModel.test.mjs src/pages/devbench/tbSyncPendingUiModel.test.mjs src/pages/devbench/diaglogic.test.mjs src/pages/devbench/enginePickerModel.test.mjs src/pages/devbench/engineStatusCache.test.mjs src/pages/devbench/pullRequestNavigation.test.mjs src/pages/devbench/pullRequestPreviewModel.test.mjs src/pages/devbench/repoAccessClient.test.mjs src/pages/devbench/tbAutoSync.test.mjs src/pages/devbench/tbTaskEntryModel.test.mjs src/pages/devbench/worktreeCleanupModel.test.mjs src/pages/devbench/worktreeProjectModel.test.mjs src/pages/performance/resourceDashboardModel.test.mjs src/pages/performance/resourceLiveModel.test.mjs src/pages/performance/resourceSamplingModeModel.test.mjs src/pages/performance/resourceScriptModel.test.mjs src/pages/performance/resourceSummaryModel.test.mjs src/pages/performance/resourceTaskUiModel.test.mjs src/pages/performance/resourceVideoModel.test.mjs src/pages/performance/resourceWorkflowModel.test.mjs src/components/markdownLinkModel.test.mjs src/components/reportContentTheme.test.mjs"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^2.0.4",
+    "@xyflow/react": "^12.10.1",
+    "html2canvas": "^1.4.1",
+    "jszip": "^3.10.1",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.1.0",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.7"
+  }
+}

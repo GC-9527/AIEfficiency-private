@@ -1,0 +1,8 @@
+{
+  "TB_TOOLKIT_PROFILE": "write",
+  "TB_TOOLKIT_WRITE_ENABLED": "false",
+  "TB_TOOLKIT_WRITE_ALLOWLIST": "CARB-<isolated-test-ticket>",
+  "TB_MCP_OPERATOR_ID": "<operator-id>",
+  "note": "Only set write enabled to true for an explicitly authorized isolated ticket canary. The caller must still pass apply=true."
+}
+

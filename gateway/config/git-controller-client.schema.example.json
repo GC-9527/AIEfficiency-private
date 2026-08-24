@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devbench.invalid/schemas/git-controller-client.schema.json",
+  "title": "DevBench protected Git Controller client configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "endpoint",
+    "expectedControllerIdentity",
+    "expectedEndpointAclFingerprint",
+    "serverPublicKeyPath",
+    "serverPublicKeySha256",
+    "clientId",
+    "clientSecretPath",
+    "gitProcessContainment"
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "absoluteProtectedPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Administrator-provisioned absolute path. Runtime rejects links, unsafe owner/ACL parent chains, and trust-anchor drift."
+    },
+    "identity": {
+      "type": "string",
+      "pattern": "^(?:sid:S-\\d(?:-\\d+)+|uid:[0-9]+)$"
+    },
+    "gitProcessContainment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "mode",
+        "containerPolicyId",
+        "policyDigest",
+        "guardianPublicKeyPath",
+        "guardianKeyId",
+        "guardianBinarySha256",
+        "gitBinarySha256"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 2 },
+        "mode": {
+          "enum": [
+            "WINDOWS_JOB_KILL_ON_CLOSE",
+            "LINUX_CGROUP_V2_SUPERVISED"
+          ]
+        },
+        "containerPolicyId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$"
+        },
+        "policyDigest": { "$ref": "#/$defs/sha256" },
+        "guardianPublicKeyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+        "guardianKeyId": { "$ref": "#/$defs/sha256" },
+        "guardianBinarySha256": { "$ref": "#/$defs/sha256" },
+        "gitBinarySha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expectedControllerIdentity": { "$ref": "#/$defs/identity" },
+    "expectedEndpointAclFingerprint": { "$ref": "#/$defs/sha256" },
+    "serverPublicKeyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "serverPublicKeySha256": { "$ref": "#/$defs/sha256" },
+    "clientId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+    },
+    "clientSecretPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "ipcGid": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 120000
+    },
+    "gitProcessContainment": {
+      "$ref": "#/$defs/gitProcessContainment"
+    }
+  }
+}

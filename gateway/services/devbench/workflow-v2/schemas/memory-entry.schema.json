@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/memory-entry-v2.json",
+  "title": "Memory Entry v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "decision",
+    "confidence",
+    "trigger",
+    "cause",
+    "prevention",
+    "applicability",
+    "evidenceIds"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "memory-entry-v2"
+    },
+    "decision": {
+      "enum": [
+        "SAVE",
+        "SKIP"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "trigger": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "cause": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "prevention": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "applicability": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "nonApplicability": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "keywords": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "maxLength": 80
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

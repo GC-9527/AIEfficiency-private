@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/review-result-v2.json",
+  "title": "Review Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "status",
+    "approved",
+    "findings",
+    "checkedAreas",
+    "unverified",
+    "evidenceRead",
+    "evidenceUnread",
+    "nextStage",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "review-result-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "evidenceRead": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "receiptIds"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finding": {
+            "type": "string",
+            "maxLength": 1500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidenceUnread": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "reason"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nextStage": {
+      "enum": [
+        "VERIFY_PREFLIGHT",
+        "REPAIR",
+        "BLOCKED",
+        null
+      ]
+    },
+    "approved": {
+      "type": "boolean"
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "title",
+          "evidence",
+          "impact",
+          "recommendation"
+        ],
+        "properties": {
+          "severity": {
+            "enum": [
+              "BLOCKER",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "impact": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "recommendation": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "ACKNOWLEDGED",
+              "RESOLVED"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "checkedAreas": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "unverified": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    }
+  }
+}

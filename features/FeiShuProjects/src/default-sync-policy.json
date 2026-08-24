@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "legacyTeambition": {
+    "projectId": "65a5f274950780b816cf905e",
+    "tasklistId": "69ddf5744b9a04cb08c4c2fa",
+    "tasklistName": "阿维塔_8678平台_应用市场",
+    "projectPathName": "平台组件 / 阿维塔_8678平台_应用市场",
+    "sprintId": "6a03e6784fa4b959a31309f7",
+    "sprintName": "Ava_应用市场_8678_待规划",
+    "sprintUrl": "https://www.teambition.com/project/65a5f274950780b816cf905e/sprint/section/6a03e6784fa4b959a31309f7",
+    "scenariofieldconfigId": "65a5f2755a1f7b88c7a28a47",
+    "taskTypeName": "缺陷",
+    "defaultExecutorId": "61d3a0b5bd146ff52e3718bc",
+    "defaultExecutorName": "徐博超",
+    "titleTemplate": "【缺陷转载-8678】【阿维塔】{sourceWorkItemNo}{problemSummary}",
+    "applicationCategoryValue": "App Market",
+    "defectCategoryValue": "功能使用BUG",
+    "tagNames": [
+      "阿维塔"
+    ]
+  },
+  "priorityMapping": {
+    "P0": 2,
+    "P1": 1,
+    "P2": 0,
+    "P3": -10
+  },
+  "routing": {
+    "enabled": true,
+    "matchMode": "first",
+    "defaultTargetId": "legacy-default",
+    "defaultStrategyId": "legacy-default",
+    "targets": [
+      {
+        "id": "legacy-default",
+        "name": "当前默认 TB 目标",
+        "system": "teambition",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "config": {}
+      },
+      {
+        "id": "spotify-8678",
+        "name": "原有 Spotify / 8678 S 应用",
+        "system": "teambition",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "config": {
+          "projectId": "65a5f274950780b816cf905e",
+          "tasklistId": "695a01be8cebcce71bb08e59",
+          "tasklistName": "阿维塔_8678平台_S应用",
+          "projectPathName": "平台组件 / 阿维塔_8678平台_S应用",
+          "sprintId": "695b527f25493cb362a7d200",
+          "sprintName": "Ava_S_8678_待规划",
+          "sprintUrl": "https://www.teambition.com/project/65a5f274950780b816cf905e/sprint/section/695b527f25493cb362a7d200",
+          "applicationCategoryValue": "S"
+        }
+      },
+      {
+        "id": "double-eight-spotify",
+        "name": "D8CDC / 双8平台 S应用",
+        "system": "teambition",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "config": {
+          "projectId": "65a5f274950780b816cf905e",
+          "tasklistId": "6952674a8440a2928c3b737e",
+          "tasklistName": "阿维塔_双8平台_S应用",
+          "projectPathName": "平台组件 / 阿维塔_双8平台_S应用",
+          "sprintId": "689c245b34a93a18aba2b2eb",
+          "sprintName": "Ava_S_双8_待规划",
+          "sprintUrl": "https://www.teambition.com/project/65a5f274950780b816cf905e/sprint/section/689c245b34a93a18aba2b2eb",
+          "applicationCategoryValue": "S"
+        }
+      },
+      {
+        "id": "double-eight-appmarket",
+        "name": "D8CDC / 双8平台 应用市场",
+        "system": "teambition",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "config": {
+          "projectId": "65a5f274950780b816cf905e",
+          "tasklistId": "69ddf581904cbb651c6722e6",
+          "tasklistName": "阿维塔_双8平台_应用市场",
+          "projectPathName": "平台组件 / 阿维塔_双8平台_应用市场",
+          "sprintId": "6a2bbc262e6e708c4fc1b0d9",
+          "sprintName": "Ava_应用市场_8155_待规划",
+          "sprintUrl": "https://www.teambition.com/project/65a5f274950780b816cf905e/sprint/section/6a2bbc262e6e708c4fc1b0d9",
+          "applicationCategoryValue": "App Market"
+        }
+      }
+    ],
+    "strategies": [
+      {
+        "id": "legacy-default",
+        "name": "兼容旧版全量同步",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "fields": {}
+      },
+      {
+        "id": "double-eight-8155-title",
+        "name": "D8CDC 8155 标题",
+        "enabled": true,
+        "builtin": true,
+        "inheritLegacy": true,
+        "titleTemplate": "【缺陷转载8155】【阿维塔】{sourceWorkItemNo}{problemSummary}",
+        "fields": {}
+      }
+    ],
+    "rules": [
+      {
+        "id": "builtin-d8cdc-spotify",
+        "name": "D8CDC + Spotify → 双8 S应用",
+        "builtin": true,
+        "enabled": true,
+        "priority": 300,
+        "sourceSystem": "feishu_project",
+        "match": "all",
+        "conditions": [
+          {
+            "field": "item.title",
+            "operator": "regex",
+            "values": [
+              "^D8CDC-"
+            ],
+            "caseSensitive": true
+          },
+          {
+            "field": "fields",
+            "fieldKeys": [
+              "field_95a8a4",
+              "function_module",
+              "functionModule",
+              "module"
+            ],
+            "fieldNames": [
+              "功能模块"
+            ],
+            "operator": "equals",
+            "values": [
+              "spotify"
+            ]
+          }
+        ],
+        "targetId": "double-eight-spotify",
+        "strategyId": "double-eight-8155-title"
+      },
+      {
+        "id": "builtin-d8cdc-non-spotify",
+        "name": "D8CDC + 非 Spotify → 双8应用市场",
+        "builtin": true,
+        "enabled": true,
+        "priority": 200,
+        "sourceSystem": "feishu_project",
+        "match": "all",
+        "conditions": [
+          {
+            "field": "item.title",
+            "operator": "regex",
+            "values": [
+              "^D8CDC-"
+            ],
+            "caseSensitive": true
+          },
+          {
+            "field": "fields",
+            "fieldKeys": [
+              "field_95a8a4",
+              "function_module",
+              "functionModule",
+              "module"
+            ],
+            "fieldNames": [
+              "功能模块"
+            ],
+            "operator": "notEquals",
+            "values": [
+              "spotify"
+            ]
+          }
+        ],
+        "targetId": "double-eight-appmarket",
+        "strategyId": "double-eight-8155-title"
+      },
+      {
+        "id": "builtin-module-spotify",
+        "name": "原有 Spotify 功能模块归属",
+        "builtin": true,
+        "enabled": true,
+        "priority": 100,
+        "sourceSystem": "feishu_project",
+        "match": "all",
+        "conditions": [
+          {
+            "field": "fields",
+            "fieldKeys": [
+              "field_95a8a4",
+              "function_module",
+              "functionModule",
+              "module"
+            ],
+            "fieldNames": [
+              "功能模块"
+            ],
+            "operator": "containsAny",
+            "values": [
+              "spotify"
+            ]
+          }
+        ],
+        "targetId": "spotify-8678",
+        "strategyId": "legacy-default"
+      }
+    ]
+  }
+}

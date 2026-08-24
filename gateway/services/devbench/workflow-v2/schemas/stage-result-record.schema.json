@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/stage-result-record-v1.json",
+  "title": "Stage Result Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "storyId",
+    "recordRevision",
+    "stageId",
+    "resultSchemaId",
+    "contextId",
+    "contextRevision",
+    "contextIdempotencyKey",
+    "resultSha256",
+    "result"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "stage-result-record-v1"
+    },
+    "storyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "recordRevision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 999999999999
+    },
+    "stageId": {
+      "enum": [
+        "TRIAGE",
+        "REPAIR",
+        "VERIFY_EXECUTE",
+        "REPORT_SHORT",
+        "REPORT_EXPERT"
+      ]
+    },
+    "resultSchemaId": {
+      "enum": [
+        "https://example.local/schemas/triage-result-v2.json",
+        "https://example.local/schemas/repair-result-v2.json",
+        "https://example.local/schemas/verification-result-v2.json",
+        "https://example.local/schemas/short-report-result-v2.json",
+        "https://example.local/schemas/expert-report-result-v2.json"
+      ]
+    },
+    "contextId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contextIdempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "resultSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "result": {
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "stageId": {
+          "const": "TRIAGE"
+        },
+        "resultSchemaId": {
+          "const": "https://example.local/schemas/triage-result-v2.json"
+        }
+      }
+    },
+    {
+      "properties": {
+        "stageId": {
+          "const": "REPAIR"
+        },
+        "resultSchemaId": {
+          "const": "https://example.local/schemas/repair-result-v2.json"
+        }
+      }
+    },
+    {
+      "properties": {
+        "stageId": {
+          "const": "VERIFY_EXECUTE"
+        },
+        "resultSchemaId": {
+          "const": "https://example.local/schemas/verification-result-v2.json"
+        }
+      }
+    },
+    {
+      "properties": {
+        "stageId": {
+          "const": "REPORT_SHORT"
+        },
+        "resultSchemaId": {
+          "const": "https://example.local/schemas/short-report-result-v2.json"
+        }
+      }
+    },
+    {
+      "properties": {
+        "stageId": {
+          "const": "REPORT_EXPERT"
+        },
+        "resultSchemaId": {
+          "const": "https://example.local/schemas/expert-report-result-v2.json"
+        }
+      }
+    }
+  ]
+}

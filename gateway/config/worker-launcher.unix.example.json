@@ -1,0 +1,32 @@
+{
+  "schema": "devbench.worker-launcher-config.v3",
+  "version": 1,
+  "identityScope": "per-story",
+  "command": "<ABSOLUTE_PATH_TO_PINNED_NATIVE_LAUNCHER_CLIENT>",
+  "args": [
+    "<ABSOLUTE_PATH_TO_GATEWAY_SERVICES>/isolated-worker-broker.mjs",
+    "<ABSOLUTE_PATH_TO_GATEWAY_SERVICES>/worker-launch-consume-helper.mjs"
+  ],
+  "brokerPath": "<ABSOLUTE_PATH_TO_GATEWAY_SERVICES>/isolated-worker-broker.mjs",
+  "brokerSha256": "<REPLACE_WITH_64_LOWERCASE_HEX_BROKER_SHA256>",
+  "consumeHelperPath": "<ABSOLUTE_PATH_TO_GATEWAY_SERVICES>/worker-launch-consume-helper.mjs",
+  "consumeHelperSha256": "<REPLACE_WITH_64_LOWERCASE_HEX_CONSUME_HELPER_SHA256>",
+  "cliAllowlist": {
+    "codex": {
+      "mode": "native",
+      "executablePath": "<ABSOLUTE_PATH_TO_PINNED_CODEX_NATIVE_EXECUTABLE>",
+      "executableSha256": "<REPLACE_WITH_64_LOWERCASE_HEX_CODEX_SHA256>"
+    },
+    "gemini": {
+      "mode": "node-entry",
+      "nodePath": "<ABSOLUTE_PATH_TO_PROTECTED_NODE>",
+      "nodeSha256": "<REPLACE_WITH_64_LOWERCASE_HEX_NODE_SHA256>",
+      "entryPath": "<ABSOLUTE_PATH_TO_PROTECTED_GEMINI_JS_ENTRY>",
+      "entrySha256": "<REPLACE_WITH_64_LOWERCASE_HEX_GEMINI_ENTRY_SHA256>"
+    }
+  },
+  "launcherSha256": "<REPLACE_WITH_64_LOWERCASE_HEX_SHA256>",
+  "expectedIdentity": {
+    "<STORY_ID>": "uid:<DISTINCT_NON_ROOT_WORKER_UID>"
+  }
+}

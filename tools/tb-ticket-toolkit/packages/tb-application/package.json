@@ -1,0 +1,12 @@
+{
+  "name": "@aiefficiency/tb-application",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/update-service.js",
+    "./bootstrap": "./src/bootstrap.js",
+    "./prepare-ticket": "./src/prepare-ticket.js",
+    "./git-isolation": "./src/git-isolation.js"
+  }
+}

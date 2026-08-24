@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/tb-ticket-context.schema.json",
+  "title": "TB Ticket Context Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "task", "fields", "unavailableFields", "attachments", "contextDigest", "collectedAt"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "task": {"type": "object", "required": ["taskId", "taskNo", "title"], "additionalProperties": true, "properties": {"taskId": {"type": "string", "minLength": 1}, "taskNo": {"type": "string", "minLength": 1}, "title": {"type": "string"}}},
+    "fields": {"type": "object", "required": ["description", "remarks", "comments", "project", "iteration", "priority", "labels", "people", "customFields", "relations", "aiefficiencyContext", "sourceCoverage"], "additionalProperties": true, "properties": {"description": {}, "remarks": {"type": "array"}, "comments": {"type": "array"}, "project": {}, "iteration": {}, "priority": {}, "labels": {"type": "array"}, "people": {"type": "object"}, "customFields": {"type": "array"}, "relations": {"type": "array"}, "aiefficiencyContext": {}, "sourceCoverage": {"type": "object"}}},
+    "unavailableFields": {"type": "array", "items": {"type": "object", "required": ["field", "reason"], "additionalProperties": false, "properties": {"field": {"type": "string"}, "reason": {"type": "string"}}}},
+    "attachments": {"type": "array"},
+    "contextDigest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "collectedAt": {"type": "string"}
+  }
+}

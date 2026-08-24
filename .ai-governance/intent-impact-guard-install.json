@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "name": "intent-impact-guard",
+  "version": "1.0.0",
+  "installed_at": "2026-08-20T09:30:46.397919+00:00",
+  "repo": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606",
+  "platforms": [
+    "claude",
+    "cline",
+    "codex",
+    "copilot",
+    "cursor",
+    "gemini",
+    "opencode",
+    "windsurf"
+  ],
+  "canonical_path": ".agents\\skills\\intent-impact-guard",
+  "canonical_sha256": "b6d1761111f3aa145b3a74b659ce8c2dbd7850e260308d17e1e2b1abd0f78800",
+  "aliases": [
+    {
+      "platform": "claude",
+      "path": ".claude\\skills\\intent-impact-guard",
+      "kind": "junction"
+    },
+    {
+      "platform": "cline",
+      "path": ".cline\\skills\\intent-impact-guard",
+      "kind": "junction"
+    }
+  ],
+  "managed_files": [
+    {
+      "path": ".cursor\\rules\\intent-impact-guard.mdc",
+      "sha256": "2d61a79263a9ce20d790bdc1b6d18788ce8c4f96b0ec3b4b5145b07bd772988a"
+    },
+    {
+      "path": ".github\\instructions\\intent-impact-guard.instructions.md",
+      "sha256": "29f19ed74210a0a732b289b6b8f9ee52c42dd7efa967bcdbf711b54d36fd6d95"
+    }
+  ],
+  "context_files": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md"
+  ],
+  "backups": [
+    ".ai-governance\\backups\\intent-impact-guard\\20260820T093045Z\\AGENTS.md",
+    ".ai-governance\\backups\\intent-impact-guard\\20260820T093045Z\\CLAUDE.md"
+  ],
+  "link_mode": "auto"
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/tb-operation-record.schema.json",
+  "title": "TB Durable Operation Record",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "operationId", "correlationId", "planId", "idempotencyKey", "taskId", "taskNo", "phase", "state", "steps", "createdAt", "updatedAt", "safeToResume", "nextAction"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "operationId": {"type": "string", "minLength": 1},
+    "correlationId": {"type": "string", "minLength": 1},
+    "planId": {"type": "string", "minLength": 1},
+    "idempotencyKey": {"type": "string", "minLength": 8},
+    "taskId": {"type": "string", "minLength": 1},
+    "taskNo": {"type": "string", "minLength": 1},
+    "phase": {"enum": ["TRIAGE", "RESOLUTION"]},
+    "state": {"enum": ["PLANNED", "APPLYING", "COMMENT_APPLIED", "STATUS_APPLIED", "COMPLETED", "PARTIAL", "FAILED", "CONFLICT"]},
+    "steps": {"type": "object", "required": ["comment", "status"], "additionalProperties": false, "properties": {"comment": {"$ref": "#/$defs/step"}, "status": {"$ref": "#/$defs/step"}}},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"},
+    "safeToResume": {"type": "boolean"},
+    "nextAction": {"type": "string"}
+  },
+  "$defs": {
+    "step": {"type": "object", "required": ["state", "attempts"], "additionalProperties": true, "properties": {"state": {"enum": ["PENDING", "UNKNOWN", "DONE", "DEDUPED"]}, "attempts": {"type": "integer", "minimum": 0}, "readbackVerified": {"type": "boolean"}}}
+  }
+}
+

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/fullstack-quality-gate-v1.json",
+  "title": "AIEfficiency Full-stack Quality Gate Configuration",
+  "type": "object",
+  "required": [
+    "version",
+    "project",
+    "routes",
+    "commands",
+    "staticAudit",
+    "bundle",
+    "browser"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "name",
+        "outputRoot"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frontendRoot": {
+          "type": "string"
+        },
+        "backendRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sourceRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputRoot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importAliases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "path",
+          "entryPatterns"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "entryPatterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "siblings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "commands": {
+      "type": "object"
+    },
+    "staticAudit": {
+      "type": "object"
+    },
+    "bundle": {
+      "type": "object"
+    },
+    "browser": {
+      "type": "object"
+    },
+    "report": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

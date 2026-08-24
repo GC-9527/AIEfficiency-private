@@ -1,0 +1,6 @@
+interface:
+  display_name: "Intent & Impact Guard"
+  short_description: "先核对需求意图、真实证据与影响，再进行最小安全改动"
+  default_prompt: "Use $intent-impact-guard to analyze this change request before editing any files."
+policy:
+  allow_implicit_invocation: true

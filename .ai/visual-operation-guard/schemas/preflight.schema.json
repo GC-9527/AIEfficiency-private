@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/preflight.schema.json",
+  "title": "Structured Preflight",
+  "type": "object",
+  "required": [
+    "targetState",
+    "successCriteria",
+    "estimatedScreenTransitions",
+    "estimatedVisualActions",
+    "coreInteractionUnderTest",
+    "chosenChannel",
+    "alternatives"
+  ],
+  "properties": {
+    "targetState": {
+      "type": "string",
+      "minLength": 1
+    },
+    "successCriteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "estimatedScreenTransitions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "estimatedVisualActions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "coreInteractionUnderTest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "chosenChannel": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sensitiveFlags": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "authentication",
+          "captcha",
+          "two_factor_authentication",
+          "admin_authorization",
+          "physical_device_action",
+          "irreversible_production_action"
+        ]
+      }
+    },
+    "alternatives": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "status",
+          "channelsChecked",
+          "reason"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "available",
+              "unavailable",
+              "not_applicable"
+            ]
+          },
+          "channelsChecked": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "strategyId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

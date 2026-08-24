@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Acceptance Routing Context v4.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_origin",
+    "scope_kind",
+    "protocols",
+    "change_type",
+    "target_repositories"
+  ],
+  "properties": {
+    "task_origin": {
+      "enum": [
+        "DIRECT_ENGINEERING",
+        "RUNTIME_STORY_POINT"
+      ]
+    },
+    "scope_kind": {
+      "enum": [
+        "PROJECT_ENGINEERING",
+        "STORY_DELIVERY",
+        "DUAL_SCOPE"
+      ]
+    },
+    "protocols": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "project-engineering-acceptance",
+          "runtime-story-point-assurance"
+        ]
+      }
+    },
+    "change_type": {
+      "enum": [
+        "FEATURE",
+        "DEFECT_FIX",
+        "REFACTOR",
+        "CONFIG_OR_DATA",
+        "PACKAGE_OR_RELEASE",
+        "TEST_OR_HARNESS",
+        "REVIEW_OR_ANALYSIS",
+        "DOCUMENTATION",
+        "MIXED"
+      ]
+    },
+    "risk_tier": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_repositories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "project_task_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "story_point_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "system",
+          "issue_id"
+        ],
+        "properties": {
+          "system": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issue_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "routing_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "routing_unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "task_origin": {
+            "const": "RUNTIME_STORY_POINT"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "story_point_id"
+        ],
+        "properties": {
+          "story_point_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "scope_kind": {
+            "const": "PROJECT_ENGINEERING"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "protocols": {
+            "contains": {
+              "const": "project-engineering-acceptance"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "scope_kind": {
+            "const": "STORY_DELIVERY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "protocols": {
+            "contains": {
+              "const": "runtime-story-point-assurance"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "scope_kind": {
+            "const": "DUAL_SCOPE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "protocols": {
+            "minItems": 2,
+            "allOf": [
+              {
+                "contains": {
+                  "const": "project-engineering-acceptance"
+                }
+              },
+              {
+                "contains": {
+                  "const": "runtime-story-point-assurance"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

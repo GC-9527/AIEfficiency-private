@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "task_id": "LOGIN-ENTRY-001",
+  "phase": "PREWRITE",
+  "repository": {
+    "root": "/repo",
+    "branch": "story/login-entry",
+    "head": "abc123",
+    "dirty": false,
+    "dirty_patch_hash": "",
+    "variant_or_flavor": "web"
+  },
+  "request": {
+    "problem_signal": "没有登录入口",
+    "business_goal": "未登录用户能进入现有认证流程，登录后返回原始受保护页面",
+    "explicit_solution": "",
+    "non_goals": [
+      "不改变 /admin 管理后台职责",
+      "不降低管理员权限"
+    ],
+    "unknowns": []
+  },
+  "evidence": [
+    {
+      "status": "VERIFIED",
+      "kind": "route",
+      "path": "web/src/router.ts",
+      "locator": "route /login",
+      "finding": "已存在独立 /login 页面"
+    },
+    {
+      "status": "VERIFIED",
+      "kind": "code",
+      "path": "web/src/auth/AuthGuard.tsx",
+      "locator": "redirect",
+      "finding": "未登录访问受保护路由时目前只返回空态，未跳登录"
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-ADMIN",
+      "statement": "/admin 保持管理后台业务页面并继续要求管理员权限",
+      "source": "web/src/router.ts + AdminLayout.tsx",
+      "verification": "验证已登录管理员访问、普通用户 403、未登录跳转",
+      "result": "PENDING"
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "summary": "在导航增加登录入口，并让 AuthGuard 跳转 /login?redirect=<safe-path>",
+      "risk": "MEDIUM",
+      "reversible": true,
+      "goal_fit": "完整",
+      "impact": "导航与守卫局部修改",
+      "rejected_reason": ""
+    },
+    {
+      "id": "B",
+      "summary": "把 /admin 页面替换成登录表单",
+      "risk": "HIGH",
+      "reversible": false,
+      "goal_fit": "入口可见但破坏后台职责",
+      "impact": "路由职责迁移",
+      "rejected_reason": "违反 INV-ADMIN"
+    }
+  ],
+  "decision": {
+    "selected_option_id": "A",
+    "reason": "保持页面职责和权限边界，附加式且可回滚",
+    "risk": "MEDIUM",
+    "permission": "LOCAL_WRITE",
+    "explicit_authorization": false,
+    "status": "READY"
+  },
+  "change_budget": {
+    "allowed_modules": [
+      "web/src/auth",
+      "web/src/navigation"
+    ],
+    "allowed_files": [
+      "web/src/auth/AuthGuard.tsx",
+      "web/src/navigation/UserMenu.tsx",
+      "web/src/auth/AuthGuard.test.tsx"
+    ],
+    "forbidden_paths": [
+      "web/src/admin/**"
+    ],
+    "max_files": 3,
+    "allow_new_dependency": false,
+    "allow_delete": false,
+    "allow_public_contract_change": false,
+    "scope_expansion_approved": false
+  },
+  "forbidden_outcomes_detected": [],
+  "verification": {
+    "planned": [
+      "AuthGuard redirect test",
+      "admin role matrix",
+      "safe redirect validation"
+    ],
+    "executed": [],
+    "status": "PENDING"
+  },
+  "actual": {
+    "changed_files": [],
+    "scope_deviation": ""
+  },
+  "result": "PENDING"
+}

@@ -1,0 +1,223 @@
+{
+  "version": "1.0.0",
+  "installedAt": "2026-08-20T09:32:18.607Z",
+  "scope": "project",
+  "projectRoot": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606",
+  "mode": "balanced",
+  "markerFiles": [
+    "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\AGENTS.md",
+    "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.gitignore"
+  ],
+  "managedFiles": [
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.agents\\skills\\efficient-ui-operation\\SKILL.md",
+      "sha256": "1fd0ce1671f3c46dee56ae426c2b8836d68d6739c372104f5964684963e6d62c",
+      "preserveOnPurge": false,
+      "relativePath": ".agents\\skills\\efficient-ui-operation\\SKILL.md"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\policy.json",
+      "sha256": "bbadd5f51ff272f9b30995c820c121a628cadd7254346c8f8b2d147b860264b8",
+      "preserveOnPurge": true,
+      "relativePath": ".ai\\visual-operation-guard\\policy.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\README.md",
+      "sha256": "795f405fd0e217ef303a7aa3620cbdeee977024078250a4bc138b9654264b1e3",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\README.md"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\schemas\\operation-map.schema.json",
+      "sha256": "d97ecd65810471c2f36ec9bb5ebe5295c10f24c296d3484589353f9adc2afac4",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\schemas\\operation-map.schema.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\schemas\\preflight.schema.json",
+      "sha256": "e734dcd3a4965b4649661b73c79ba6b89a6ba1e5a00299b718ab48a1776535c4",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\schemas\\preflight.schema.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\schemas\\visual-operation-policy.schema.json",
+      "sha256": "7758e48bb8e431366b2f5f608658e695013adae90979244c9ae7b83da92e4237",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\schemas\\visual-operation-policy.schema.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\operation-map.json",
+      "sha256": "fafafdd9dae992c2c97ec1e584dfd0db0bd887263ac4aec0657c1763112c6c18",
+      "preserveOnPurge": true,
+      "relativePath": ".ai\\operation-map.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\examples\\android-operation-map.json",
+      "sha256": "b45d668860b24becf55de73731d35f276c4034cc275537d426d03ea8f48ec878",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\examples\\android-operation-map.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\examples\\web-operation-map.json",
+      "sha256": "f6a55b1cc93905c241f84e6d6b168f289ae16395579b258017471c17d7cb811a",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\examples\\web-operation-map.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\.ai\\visual-operation-guard\\examples\\desktop-operation-map.json",
+      "sha256": "f4a650f04df7a5fa882ac94717715d33e28b136cc2ea00e93261fc7505d78bae",
+      "preserveOnPurge": false,
+      "relativePath": ".ai\\visual-operation-guard\\examples\\desktop-operation-map.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\bin\\aievog.mjs",
+      "sha256": "2e0f86ce2cbf442156487d6f4ea4ab7d8fd65c4fae78aaab5ae87d079f419924",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\bin\\aievog.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\package.json",
+      "sha256": "dab168c8a308939f9ce4e6966c6c865ff15c195333af81b431d0da3538cc3f7b",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\package.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\guard.mjs",
+      "sha256": "d495fbb47f761232bcd1a462a2f38fc42f616c282b3b1301c03231abb698b85a",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\guard.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\index.mjs",
+      "sha256": "eadf3b152686a3741c706d81d517b4e8437248a0ecc908b82976b71d9e9a5829",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\index.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\metrics.mjs",
+      "sha256": "d4da863dcffdc41b4890a38ef27d00eaf43529c479199644b3f59dc9d301dac6",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\metrics.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\operation-selector.mjs",
+      "sha256": "726ffefd4db1b95257141a920a2616cc0bd8e2de0527c6cc0354569c53b10b94",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\operation-selector.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\policy.mjs",
+      "sha256": "e6060064b61638d88c4cc2315a95700ac14f1cc264a26c9aa6ec1bc2a78b2fc1",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\policy.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\server.mjs",
+      "sha256": "508438758227dfbcab7a7f814879126b67153cd3249c31cffef62b54b8729bc8",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\server.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\store.mjs",
+      "sha256": "623b3e4975bfc680e5a0b684b574cd759981a3658967d4bfc613b90ba7f1d446",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\store.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\src\\utils.mjs",
+      "sha256": "3a3ff1f3b87bc4f1e4b59dcc157f59aa5591b016bca84a86cbe510cdf815c16b",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\src\\utils.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\test\\fixtures\\operation-map.json",
+      "sha256": "f6a55b1cc93905c241f84e6d6b168f289ae16395579b258017471c17d7cb811a",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\test\\fixtures\\operation-map.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\test\\fixtures\\policy.json",
+      "sha256": "bbadd5f51ff272f9b30995c820c121a628cadd7254346c8f8b2d147b860264b8",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\test\\fixtures\\policy.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\test\\guard.test.mjs",
+      "sha256": "58ba5297fee0eee26d246a6b19c0cde0a70ab417cadb3ce0a19e197b659ffbd6",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\test\\guard.test.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\test\\server.test.mjs",
+      "sha256": "ceae85aae90a38b1440702bf1890c2aa1f70cc351b43f81a126063159f1e0c6a",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\test\\server.test.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\test\\support.test.mjs",
+      "sha256": "979a5bab41c09d895603da7420ffbebbd60e402dab8ee09855677df6fda37df6",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\test\\support.test.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\tools\\visual-operation-guard\\types\\index.d.ts",
+      "sha256": "918ed96be409084c4970da85388b1fd506a5cd05563b7fceb5323c94f74009cd",
+      "preserveOnPurge": false,
+      "relativePath": "tools\\visual-operation-guard\\types\\index.d.ts"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\aiefficiency-config.example.yaml",
+      "sha256": "755a851d69f7b94ac904601fa9bcecde810ee5eeff0864c6533327f00b5f3d88",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\aiefficiency-config.example.yaml"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\feature-flags.example.json",
+      "sha256": "7f99ee6d26a6c0a2a8d723f7b3c1ed80bde8556a1c7e651e06511705493b6b2f",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\feature-flags.example.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\http-client.mjs",
+      "sha256": "48eb37401c668d7bb05e8aa5973cfe76b3b5913e8b03cf04fd2c6ea575504321",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\http-client.mjs"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\orchestrator-integration.ts",
+      "sha256": "87d71bc8b9a1cf9ef3dc1449c0fd61abaa78b304832b0a0ade6e5bce6a75579b",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\orchestrator-integration.ts"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\postgresql-schema.sql",
+      "sha256": "230cfd4662c422390f095e5f10cd924d80b13935f79649b85a6bdffbec3599b5",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\postgresql-schema.sql"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\prometheus-alerts.example.yaml",
+      "sha256": "5c501050a2bdf52c10184223d2729b3e8f0da7ed5497ed64ea85d1c4c98b4772",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\prometheus-alerts.example.yaml"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\tool-classification.example.json",
+      "sha256": "79abd608978be1419d8ba7d50645cab34582e3663591a78fcb98c925d4af31cc",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\tool-classification.example.json"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\visual-operation-guard.openapi.yaml",
+      "sha256": "8f9c3dad11a04bb063d548e2721d12cae8a5b50c0f51f1d8f19c61ab4406c4f2",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\visual-operation-guard.openapi.yaml"
+    },
+    {
+      "path": "D:\\workspace\\xsProjects\\202606\\AIEfficiency202606\\docs\\ai\\visual-operation-guard\\integration\\wrap-tool-executor.mjs",
+      "sha256": "3169c8122fa2a0f2371954680d718b8f502745fc25d2db1a87404568276305b4",
+      "preserveOnPurge": false,
+      "relativePath": "docs\\ai\\visual-operation-guard\\integration\\wrap-tool-executor.mjs"
+    }
+  ]
+}

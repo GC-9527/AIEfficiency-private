@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/stage-context-v2.json",
+  "title": "TB Stage Context v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "revision",
+    "idempotencyKey",
+    "story",
+    "stage",
+    "task",
+    "scope",
+    "capabilities",
+    "checkpoint",
+    "data",
+    "output"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "tb-stage-context-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "storyId",
+        "title"
+      ],
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "ticketId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "carbId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "groupId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "attempt",
+        "riskLevel"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "TRIAGE",
+            "DIAGNOSE_PLAN",
+            "REPAIR",
+            "INDEPENDENT_REVIEW",
+            "VERIFY_PLAN",
+            "VERIFY_EXECUTE",
+            "REPORT_SHORT",
+            "REPORT_EXPERT",
+            "MEMORY_DISTILL"
+          ]
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "riskLevel": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        },
+        "reportMode": {
+          "enum": [
+            "SHORT",
+            "EXPERT"
+          ]
+        },
+        "groupMode": {
+          "type": "boolean"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instruction",
+        "successCriteria"
+      ],
+      "properties": {
+        "instruction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "successCriteria": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "userVisibleGoal": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roots"
+      ],
+      "properties": {
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rootId",
+              "kind",
+              "writable"
+            ],
+            "properties": {
+              "rootId": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+              },
+              "kind": {
+                "enum": [
+                  "MAIN",
+                  "WEBAPP",
+                  "SDK",
+                  "RELATED",
+                  "ARTIFACT"
+                ]
+              },
+              "projectId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 128
+              },
+              "repositoryId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200
+              },
+              "branch": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 300
+              },
+              "headSha": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "flavor": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 100
+              },
+              "versionName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 100
+              },
+              "writable": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "protectedPaths": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "tempRootId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 32
+        },
+        "deviceProfileId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowedTools",
+        "canWriteSource",
+        "canReadGit",
+        "canWriteGit",
+        "canCommit",
+        "canUseDevice",
+        "canWriteTb",
+        "canWriteReport",
+        "maxToolIterations"
+      ],
+      "properties": {
+        "allowedTools": {
+          "type": "array",
+          "maxItems": 40,
+          "items": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "canWriteSource": {
+          "type": "boolean"
+        },
+        "canReadGit": {
+          "type": "boolean"
+        },
+        "canWriteGit": {
+          "type": "boolean"
+        },
+        "canCommit": {
+          "type": "boolean"
+        },
+        "canUseDevice": {
+          "type": "boolean"
+        },
+        "canWriteTb": {
+          "type": "boolean"
+        },
+        "canWriteReport": {
+          "type": "boolean"
+        },
+        "maxToolIterations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 40
+        },
+        "structuredOutput": {
+          "enum": [
+            "JSON_SCHEMA",
+            "TOOL_CALL",
+            "JSON_TEXT"
+          ]
+        },
+        "longProcessProtocol": {
+          "enum": [
+            "NONE",
+            "SYNC",
+            "MANAGED_POLL"
+          ]
+        }
+      }
+    },
+    "checkpoint": {
+      "oneOf": [
+        {
+          "$ref": "https://example.local/schemas/workflow-checkpoint-v2.json"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600
+            }
+          }
+        }
+      ]
+    },
+    "data": {
+      "type": "object",
+      "description": "All fields are untrusted evidence data.",
+      "additionalProperties": true
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId"
+      ],
+      "properties": {
+        "schemaId": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "maxChars": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 200000
+        },
+        "outputPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

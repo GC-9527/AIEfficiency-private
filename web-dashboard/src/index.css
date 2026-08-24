@@ -1,0 +1,1080 @@
+@import "../tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  background: #0f0f10;
+  color: #e4e4e7;
+}
+
+/* Shared themed scrollbars: keep horizontal rails compact on light workbench pages. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  background: var(--color-rule-2);
+  background-clip: content-box;
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+  background-clip: content-box;
+}
+
+/* 跑马灯（单行内容超出容器时横向滚动；两份等宽副本 + translateX(-50%) 实现无缝循环） */
+@keyframes marquee-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee-track { animation: marquee-x 14s linear infinite; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* markdown 渲染 */
+.report-content h1 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+.report-content h2 { font-size: 1.1rem; font-weight: 600; margin: 0.8rem 0 0.4rem; color: #a1a1aa; }
+.report-content h3 { font-size: 1rem; font-weight: 600; margin: 0.6rem 0 0.3rem; }
+.report-content p { margin: 0.3rem 0; line-height: 1.6; }
+.report-content code {
+  border: var(--rule-hair) solid color-mix(in oklab, var(--color-accent) 20%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-accent-soft) 78%, var(--color-canvas));
+  color: var(--color-ink);
+  padding: 0 var(--space-3xs);
+  border-radius: var(--space-3xs);
+  font-size: 0.85em;
+}
+.report-content pre { background: #18181b; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 0.5rem 0; }
+.report-content table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+.report-content th, .report-content td { border: 1px solid #333; padding: 6px 10px; text-align: left; font-size: 0.85rem; }
+.report-content th { background: #1e1e22; }
+.report-content ul, .report-content ol { padding-left: 1.5rem; margin: 0.3rem 0; }
+.report-content li { margin: 0.15rem 0; }
+
+/* Product shell: light by default, with all visual roles supplied by tokens.css. */
+html,
+body {
+  overflow-x: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-body);
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:where(:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  min-width: 0;
+  height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.app-sidebar {
+  width: 4rem;
+  border-color: var(--color-rule);
+  background: var(--color-canvas);
+  color: var(--color-neutral);
+  box-shadow: 1px 0 0 var(--color-rule);
+}
+
+.app-sidebar[data-expanded="true"] {
+  width: 4rem;
+}
+
+.app-brand-mark {
+  display: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-input);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.app-sidebar__toggle {
+  width: 2.75rem !important;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  flex: 0 0 2.75rem;
+  border: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-paper);
+  color: var(--color-muted);
+}
+
+.app-sidebar > div:first-child {
+  justify-content: center;
+  padding-inline: var(--space-2xs);
+}
+
+.app-sidebar > .flex-1 {
+  padding-inline: var(--space-2xs);
+}
+
+.app-sidebar__item {
+  min-height: 2.75rem;
+  border: var(--rule-hair) solid transparent;
+  border-radius: var(--radius-input);
+  color: var(--color-muted);
+}
+
+.app-sidebar__item.is-active {
+  border-color: var(--color-rule);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.app-sidebar__label {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+}
+
+.app-sidebar__machine {
+  display: none;
+}
+
+.app-main {
+  min-width: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/*
+ * Light-route compatibility layer.
+ * Legacy business pages still use dark Tailwind zinc utilities. Match complete
+ * class tokens only so state variants such as disabled:bg-zinc-700 cannot
+ * override blue, green, amber, or red semantic controls in their normal state.
+ * DevBench keeps its independent keep-alive geometry but now consumes the same
+ * light surface contract through the devbench-route-surface class.
+ */
+.app-route-surface {
+  min-width: 0;
+  height: 100%;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(
+  [class~="bg-[#0f0f10]"],
+  [class~="bg-[#18181b]"],
+  [class~="bg-zinc-950"],
+  [class^="bg-zinc-950/"],
+  [class*=" bg-zinc-950/"],
+  [class~="bg-zinc-900"],
+  [class^="bg-zinc-900/"],
+  [class*=" bg-zinc-900/"]
+) {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(
+  [class~="bg-zinc-800"],
+  [class^="bg-zinc-800/"],
+  [class*=" bg-zinc-800/"],
+  [class~="bg-zinc-700"],
+  [class^="bg-zinc-700/"],
+  [class*=" bg-zinc-700/"]
+) {
+  background-color: var(--color-paper-2);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(
+  [class~="text-zinc-50"],
+  [class^="text-zinc-50/"],
+  [class*=" text-zinc-50/"],
+  [class~="text-zinc-100"],
+  [class^="text-zinc-100/"],
+  [class*=" text-zinc-100/"],
+  [class~="text-zinc-200"],
+  [class^="text-zinc-200/"],
+  [class*=" text-zinc-200/"],
+  [class~="text-zinc-300"],
+  [class^="text-zinc-300/"],
+  [class*=" text-zinc-300/"]
+) {
+  color: var(--color-ink-2);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(
+  [class~="text-zinc-400"],
+  [class^="text-zinc-400/"],
+  [class*=" text-zinc-400/"],
+  [class~="text-zinc-500"],
+  [class^="text-zinc-500/"],
+  [class*=" text-zinc-500/"],
+  [class~="text-zinc-600"],
+  [class^="text-zinc-600/"],
+  [class*=" text-zinc-600/"]
+) {
+  color: var(--color-muted);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(
+  [class~="border-zinc-400"],
+  [class^="border-zinc-400/"],
+  [class*=" border-zinc-400/"],
+  [class~="border-zinc-500"],
+  [class^="border-zinc-500/"],
+  [class*=" border-zinc-500/"],
+  [class~="border-zinc-600"],
+  [class^="border-zinc-600/"],
+  [class*=" border-zinc-600/"],
+  [class~="border-zinc-700"],
+  [class^="border-zinc-700/"],
+  [class*=" border-zinc-700/"],
+  [class~="border-zinc-800"],
+  [class^="border-zinc-800/"],
+  [class*=" border-zinc-800/"],
+  [class~="border-zinc-900"],
+  [class^="border-zinc-900/"],
+  [class*=" border-zinc-900/"]
+) {
+  border-color: var(--color-rule);
+}
+
+:is(.app-route-surface, .devbench-portal-theme) :is(input, textarea)[class~="placeholder-zinc-600"]::placeholder {
+  color: var(--color-muted);
+}
+
+/* DevBench extends the shared bridge with its engineering-status palette. */
+.devbench-route-surface {
+  color-scheme: light;
+  background: var(--color-paper);
+}
+
+.devbench-status-banner--success,
+.devbench-status-surface--success {
+  border-color: color-mix(in oklab, var(--status-success) 22%, var(--color-rule));
+  background: color-mix(in oklab, var(--status-success-soft) 72%, var(--color-canvas));
+}
+
+.devbench-status-banner--warning,
+.devbench-status-surface--warning {
+  border-color: color-mix(in oklab, var(--status-warning) 22%, var(--color-rule));
+  background: color-mix(in oklab, var(--status-warning-soft) 72%, var(--color-canvas));
+}
+
+.devbench-status-banner--danger,
+.devbench-status-surface--danger {
+  border-color: color-mix(in oklab, var(--status-danger) 22%, var(--color-rule));
+  background: color-mix(in oklab, var(--status-danger-soft) 72%, var(--color-canvas));
+}
+
+.devbench-status-banner--info,
+.devbench-status-surface--info {
+  border-color: color-mix(in oklab, var(--color-accent) 22%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-accent-soft) 72%, var(--color-canvas));
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) [class~="bg-[#101112]"] {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="bg-red-9"],
+  [class*=" bg-red-9"]
+) {
+  background-color: var(--status-danger-soft);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="bg-amber-9"],
+  [class*=" bg-amber-9"],
+  [class^="bg-yellow-9"],
+  [class*=" bg-yellow-9"],
+  [class^="bg-orange-9"],
+  [class*=" bg-orange-9"]
+) {
+  background-color: var(--status-warning-soft);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="bg-green-9"],
+  [class*=" bg-green-9"],
+  [class^="bg-emerald-9"],
+  [class*=" bg-emerald-9"],
+  [class^="bg-teal-9"],
+  [class*=" bg-teal-9"]
+) {
+  background-color: var(--status-success-soft);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="bg-blue-9"],
+  [class*=" bg-blue-9"],
+  [class^="bg-cyan-9"],
+  [class*=" bg-cyan-9"],
+  [class^="bg-sky-9"],
+  [class*=" bg-sky-9"],
+  [class^="bg-indigo-9"],
+  [class*=" bg-indigo-9"],
+  [class^="bg-violet-9"],
+  [class*=" bg-violet-9"],
+  [class^="bg-purple-9"],
+  [class*=" bg-purple-9"],
+  [class^="bg-fuchsia-9"],
+  [class*=" bg-fuchsia-9"]
+) {
+  background-color: var(--color-accent-soft);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="text-red-1"], [class*=" text-red-1"],
+  [class^="text-red-2"], [class*=" text-red-2"],
+  [class^="text-red-3"], [class*=" text-red-3"],
+  [class^="text-red-4"], [class*=" text-red-4"]
+) {
+  color: var(--status-danger);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="text-amber-1"], [class*=" text-amber-1"],
+  [class^="text-amber-2"], [class*=" text-amber-2"],
+  [class^="text-amber-3"], [class*=" text-amber-3"],
+  [class^="text-amber-4"], [class*=" text-amber-4"],
+  [class^="text-yellow-1"], [class*=" text-yellow-1"],
+  [class^="text-yellow-2"], [class*=" text-yellow-2"],
+  [class^="text-yellow-3"], [class*=" text-yellow-3"],
+  [class^="text-orange-1"], [class*=" text-orange-1"],
+  [class^="text-orange-2"], [class*=" text-orange-2"],
+  [class^="text-orange-3"], [class*=" text-orange-3"]
+) {
+  color: var(--status-warning);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="text-green-1"], [class*=" text-green-1"],
+  [class^="text-green-2"], [class*=" text-green-2"],
+  [class^="text-green-3"], [class*=" text-green-3"],
+  [class^="text-green-4"], [class*=" text-green-4"],
+  [class^="text-emerald-1"], [class*=" text-emerald-1"],
+  [class^="text-emerald-2"], [class*=" text-emerald-2"],
+  [class^="text-emerald-3"], [class*=" text-emerald-3"],
+  [class^="text-emerald-4"], [class*=" text-emerald-4"],
+  [class^="text-teal-1"], [class*=" text-teal-1"],
+  [class^="text-teal-2"], [class*=" text-teal-2"],
+  [class^="text-teal-3"], [class*=" text-teal-3"]
+) {
+  color: var(--status-success);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="text-blue-1"], [class*=" text-blue-1"],
+  [class^="text-blue-2"], [class*=" text-blue-2"],
+  [class^="text-blue-3"], [class*=" text-blue-3"],
+  [class^="text-blue-4"], [class*=" text-blue-4"],
+  [class^="text-cyan-1"], [class*=" text-cyan-1"],
+  [class^="text-cyan-2"], [class*=" text-cyan-2"],
+  [class^="text-cyan-3"], [class*=" text-cyan-3"],
+  [class^="text-cyan-4"], [class*=" text-cyan-4"],
+  [class^="text-sky-1"], [class*=" text-sky-1"],
+  [class^="text-sky-2"], [class*=" text-sky-2"],
+  [class^="text-sky-3"], [class*=" text-sky-3"],
+  [class^="text-indigo-1"], [class*=" text-indigo-1"],
+  [class^="text-indigo-2"], [class*=" text-indigo-2"],
+  [class^="text-indigo-3"], [class*=" text-indigo-3"],
+  [class^="text-violet-1"], [class*=" text-violet-1"],
+  [class^="text-violet-2"], [class*=" text-violet-2"],
+  [class^="text-violet-3"], [class*=" text-violet-3"],
+  [class^="text-purple-1"], [class*=" text-purple-1"],
+  [class^="text-purple-2"], [class*=" text-purple-2"],
+  [class^="text-purple-3"], [class*=" text-purple-3"],
+  [class^="text-fuchsia-1"], [class*=" text-fuchsia-1"],
+  [class^="text-fuchsia-2"], [class*=" text-fuchsia-2"],
+  [class^="text-fuchsia-3"], [class*=" text-fuchsia-3"]
+) {
+  color: var(--color-accent);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="border-red-"], [class*=" border-red-"]
+) {
+  border-color: color-mix(in oklab, var(--status-danger) 24%, var(--color-rule));
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="border-amber-"], [class*=" border-amber-"],
+  [class^="border-yellow-"], [class*=" border-yellow-"],
+  [class^="border-orange-"], [class*=" border-orange-"]
+) {
+  border-color: color-mix(in oklab, var(--status-warning) 24%, var(--color-rule));
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="border-green-"], [class*=" border-green-"],
+  [class^="border-emerald-"], [class*=" border-emerald-"],
+  [class^="border-teal-"], [class*=" border-teal-"]
+) {
+  border-color: color-mix(in oklab, var(--status-success) 24%, var(--color-rule));
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class^="border-blue-"], [class*=" border-blue-"],
+  [class^="border-cyan-"], [class*=" border-cyan-"],
+  [class^="border-sky-"], [class*=" border-sky-"],
+  [class^="border-indigo-"], [class*=" border-indigo-"],
+  [class^="border-violet-"], [class*=" border-violet-"],
+  [class^="border-purple-"], [class*=" border-purple-"],
+  [class^="border-fuchsia-"], [class*=" border-fuchsia-"]
+) {
+  border-color: color-mix(in oklab, var(--color-accent) 24%, var(--color-rule));
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme) :is(
+  [class~="bg-zinc-950"],
+  [class^="bg-zinc-950/"],
+  [class*=" bg-zinc-950/"],
+  [class~="bg-zinc-900"],
+  [class^="bg-zinc-900/"],
+  [class*=" bg-zinc-900/"],
+  [class~="bg-zinc-800"],
+  [class^="bg-zinc-800/"],
+  [class*=" bg-zinc-800/"],
+  [class~="bg-zinc-700"],
+  [class^="bg-zinc-700/"],
+  [class*=" bg-zinc-700/"]
+)[class~="text-white"] {
+  color: var(--color-ink);
+}
+
+:is(.devbench-route-surface, .devbench-portal-theme)
+button:disabled[class*="disabled:from-zinc-"] {
+  border-color: var(--color-rule);
+  background-color: var(--color-paper-2);
+  background-image: none;
+  color: var(--color-muted);
+  box-shadow: none;
+}
+
+.floating-dock {
+  z-index: var(--z-dock);
+  border: var(--rule-hair) solid var(--color-rule);
+  background: color-mix(in oklab, var(--color-canvas) 92%, transparent);
+  color: var(--color-ink-2);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(18px);
+}
+
+.floating-dock__eyebrow {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.floating-dock__toggle {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--radius-input);
+  color: var(--color-muted);
+}
+
+.floating-dock__toggle:active {
+  transform: translateY(1px);
+}
+
+/* CarDev workbench */
+.cardev-workbench {
+  min-width: 0;
+  min-height: 100%;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.cardev-header {
+  position: relative;
+  z-index: var(--z-sticky);
+  flex: 0 0 auto;
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+  background: color-mix(in oklab, var(--color-paper) 94%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.cardev-header__summary {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+}
+
+.cardev-title-group {
+  min-width: 0;
+}
+
+.cardev-title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.cardev-title-row h1 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.2;
+}
+
+.cardev-title-group p {
+  margin: var(--space-3xs) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.cardev-clock {
+  flex: 0 0 auto;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-canvas);
+  color: var(--color-neutral);
+  padding: var(--space-3xs) var(--space-2xs);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.6875rem;
+}
+
+.cardev-device-context {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-input);
+  background: var(--color-canvas);
+  padding: var(--space-2xs) var(--space-xs);
+}
+
+.cardev-device-context__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  background: var(--status-warning);
+}
+
+.cardev-device-context[data-device-state="connected"] .cardev-device-context__dot {
+  background: var(--status-success);
+}
+
+.cardev-device-context__label {
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+}
+
+.cardev-device-context__value {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardev-device-context[data-device-state="idle"] .cardev-device-context__value {
+  color: var(--status-warning);
+  font-family: var(--font-body);
+}
+
+.cardev-tab-rail {
+  display: flex;
+  gap: var(--space-3xs);
+  overflow-x: auto;
+  padding: 0 var(--space-sm) var(--space-2xs);
+  scrollbar-width: none;
+}
+
+.cardev-tab-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.cardev-tab {
+  min-height: 2.75rem;
+  flex: 0 0 auto;
+  border: var(--rule-hair) solid transparent;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--color-muted);
+  padding-inline: var(--space-xs);
+  font-size: var(--text-xs);
+  font-weight: 560;
+  white-space: nowrap;
+}
+
+.cardev-tab[aria-selected="true"] {
+  border-color: var(--color-rule);
+  background: var(--color-canvas);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-control);
+}
+
+.cardev-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.cardev-content__inner {
+  width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+}
+
+.cardev-card {
+  min-width: 0;
+  overflow: hidden;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-card);
+}
+
+.cardev-card__header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+  padding: 0.75rem var(--space-sm);
+}
+
+.cardev-card__header h3 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 620;
+}
+
+.cardev-card__action {
+  flex: 0 0 auto;
+}
+
+.cardev-card__body {
+  min-width: 0;
+  overflow-x: auto;
+  padding: var(--space-sm);
+}
+
+.cardev-grid,
+.cardev-button-grid {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-xs);
+}
+
+.cardev-grid {
+  gap: var(--space-sm);
+}
+
+.cardev-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  border: var(--rule-hair) solid transparent;
+  border-radius: var(--radius-input);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  font-weight: 620;
+  line-height: 1.15;
+  white-space: nowrap;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+
+.cardev-button[data-variant="secondary"] {
+  border-color: var(--color-rule);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+}
+
+.cardev-button[data-variant="ghost"] {
+  border-color: var(--color-rule);
+  background: transparent;
+  color: var(--color-neutral);
+}
+
+.cardev-button[data-variant="danger"] {
+  background: var(--status-danger);
+  color: var(--color-accent-ink);
+}
+
+.cardev-button[data-state="success"] {
+  background: var(--status-success);
+  color: var(--color-accent-ink);
+}
+
+.cardev-button[data-state="error"] {
+  background: var(--status-danger);
+  color: var(--color-accent-ink);
+}
+
+.cardev-button[data-state="loading"] {
+  cursor: progress;
+}
+
+.cardev-button:active {
+  transform: translateY(1px);
+}
+
+.cardev-button:disabled,
+.cardev-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cardev-button--block {
+  width: 100%;
+}
+
+.cardev-button__spinner {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: var(--radius-pill);
+  animation: cardev-spin 700ms linear infinite;
+}
+
+@keyframes cardev-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cardev-field {
+  min-width: 0;
+}
+
+.cardev-field__label {
+  display: block;
+  margin-block-end: var(--space-3xs);
+  color: var(--color-neutral);
+  font-size: var(--text-xs);
+  font-weight: 560;
+}
+
+.cardev-field__helper {
+  min-height: 1lh;
+  margin: var(--space-3xs) 0 0;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.cardev-field__helper.is-error {
+  color: var(--status-danger);
+}
+
+.cardev-input,
+.cardev-select {
+  width: 100%;
+  min-height: 2.75rem;
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-input);
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  padding: var(--space-2xs) var(--space-lg) var(--space-2xs) var(--space-xs);
+  font-size: var(--text-xs);
+}
+
+.cardev-input::placeholder {
+  color: var(--color-muted);
+}
+
+.cardev-input:focus-visible,
+.cardev-select:focus-visible {
+  border-width: var(--rule-hair);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.cardev-input[aria-invalid="true"],
+.cardev-select[aria-invalid="true"] {
+  border-color: var(--status-danger);
+}
+
+.cardev-input[data-state="success"],
+.cardev-select[data-state="success"] {
+  border-color: var(--status-success);
+}
+
+.cardev-input[data-state="loading"],
+.cardev-select[data-state="loading"] {
+  background: var(--color-accent-soft);
+}
+
+.cardev-input:disabled,
+.cardev-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.cardev-status-dock {
+  position: sticky;
+  z-index: var(--z-sticky);
+  inset-block-end: 0;
+  margin: var(--space-sm) calc(var(--space-sm) * -1) calc(var(--space-sm) * -1);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  background: color-mix(in oklab, var(--color-paper) 94%, transparent);
+  padding: var(--space-2xs) var(--space-sm);
+  backdrop-filter: blur(14px);
+}
+
+.cardev-status {
+  max-height: 8rem;
+  overflow-y: auto;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-input);
+  background: var(--color-paper-2);
+  color: var(--color-neutral);
+  padding: var(--space-2xs) var(--space-xs);
+  font-family: var(--font-outlier);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.cardev-status[data-tone="success"] {
+  border-color: color-mix(in oklab, var(--status-success) 34%, var(--color-rule));
+  background: var(--status-success-soft);
+  color: var(--status-success);
+}
+
+.cardev-status[data-tone="danger"] {
+  border-color: color-mix(in oklab, var(--status-danger) 34%, var(--color-rule));
+  background: var(--status-danger-soft);
+  color: var(--status-danger);
+}
+
+/* Scoped migration bridge for the existing CarDev task panels. */
+.cardev-workbench [class*="bg-zinc-"] {
+  background-color: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+.cardev-workbench [class*="text-zinc-1"],
+.cardev-workbench [class*="text-zinc-2"],
+.cardev-workbench [class*="text-zinc-3"] {
+  color: var(--color-ink-2);
+}
+
+.cardev-workbench [class*="text-zinc-4"],
+.cardev-workbench [class*="text-zinc-5"],
+.cardev-workbench [class*="text-zinc-6"] {
+  color: var(--color-muted);
+}
+
+.cardev-workbench [class*="border-zinc-"] {
+  border-color: var(--color-rule);
+}
+
+.cardev-workbench table {
+  min-width: 40rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :is(.devbench-route-surface, .devbench-portal-theme) :is(
+    [class*="hover:bg-zinc-800"],
+    [class*="hover:bg-zinc-700"]
+  ):hover {
+    background: var(--color-paper-3);
+    color: var(--color-ink);
+  }
+
+  :is(.devbench-route-surface, .devbench-portal-theme) :is([class*="hover:bg-red-9"]):hover {
+    background: color-mix(in oklab, var(--status-danger-soft) 84%, var(--status-danger));
+  }
+
+  :is(.devbench-route-surface, .devbench-portal-theme) :is(
+    [class*="hover:bg-amber-9"],
+    [class*="hover:bg-yellow-9"],
+    [class*="hover:bg-orange-9"]
+  ):hover {
+    background: color-mix(in oklab, var(--status-warning-soft) 84%, var(--status-warning));
+  }
+
+  :is(.devbench-route-surface, .devbench-portal-theme) :is(
+    [class*="hover:bg-green-9"],
+    [class*="hover:bg-emerald-9"],
+    [class*="hover:bg-teal-9"]
+  ):hover {
+    background: color-mix(in oklab, var(--status-success-soft) 84%, var(--status-success));
+  }
+
+  :is(.devbench-route-surface, .devbench-portal-theme) :is(
+    [class*="hover:bg-blue-9"],
+    [class*="hover:bg-cyan-9"],
+    [class*="hover:bg-sky-9"],
+    [class*="hover:bg-indigo-9"],
+    [class*="hover:bg-violet-9"],
+    [class*="hover:bg-purple-9"],
+    [class*="hover:bg-fuchsia-9"]
+  ):hover {
+    background: color-mix(in oklab, var(--color-accent-soft) 84%, var(--color-accent));
+  }
+
+  :is(.app-route-surface, .devbench-portal-theme) :is(button, a)[class~="bg-zinc-800"]:hover,
+  :is(.app-route-surface, .devbench-portal-theme) :is(button, a)[class~="bg-zinc-700"]:hover {
+    background: var(--color-paper-3);
+    color: var(--color-ink);
+  }
+
+  .app-sidebar__toggle:hover,
+  .floating-dock__toggle:hover {
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+  }
+
+  .app-sidebar__item:not(.is-active):hover {
+    background: var(--color-paper-2);
+    color: var(--color-ink-2);
+  }
+
+  .cardev-tab:hover {
+    background: var(--color-paper-2);
+    color: var(--color-ink-2);
+  }
+
+  .cardev-button:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .cardev-button[data-variant="secondary"]:hover,
+  .cardev-button[data-variant="ghost"]:hover {
+    background: var(--color-paper-3);
+    color: var(--color-ink);
+  }
+
+  .cardev-button[data-variant="danger"]:hover {
+    background: color-mix(in oklab, var(--status-danger) 88%, var(--color-ink));
+    color: var(--color-accent-ink);
+  }
+
+  .cardev-input:hover,
+  .cardev-select:hover {
+    background: var(--color-paper-2);
+  }
+}
+
+@media (pointer: coarse) {
+  .cardev-button,
+  .cardev-tab,
+  .app-sidebar__item,
+  .app-sidebar__toggle,
+  .floating-dock__toggle {
+    min-height: 3rem;
+  }
+}
+
+@media (min-width: 40rem) {
+  .app-sidebar[data-expanded="true"] {
+    width: 11.25rem;
+  }
+
+  .app-sidebar[data-expanded="true"] .app-sidebar__label {
+    width: 6.25rem;
+    opacity: 1;
+    transition: opacity var(--dur-short) var(--ease-out);
+  }
+
+  .app-sidebar[data-expanded="true"] .app-brand-mark {
+    display: grid;
+  }
+
+  .app-sidebar[data-expanded="true"] > div:first-child {
+    justify-content: space-between;
+    padding-inline: 0.5rem;
+  }
+
+  .app-sidebar__machine {
+    display: block;
+  }
+
+  .app-sidebar__machine button,
+  .app-sidebar__machine a,
+  .app-sidebar__machine select {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .cardev-header__summary {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, auto);
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .cardev-tab-rail {
+    padding-inline: var(--space-md);
+  }
+
+  .cardev-content {
+    padding: var(--space-md);
+  }
+}
+
+@media (min-width: 60rem) {
+  .cardev-header__summary,
+  .cardev-tab-rail,
+  .cardev-content {
+    padding-inline: var(--space-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

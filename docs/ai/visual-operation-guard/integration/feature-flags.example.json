@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "flags": {
+    "visual_guard.enabled": true,
+    "visual_guard.shadow": false,
+    "visual_guard.soft_enforce": false,
+    "visual_guard.hard_enforce": true,
+    "visual_guard.operation_map": true,
+    "visual_guard.human_handoff": true,
+    "visual_guard.release_locks_on_block": true
+  },
+  "overrides": [
+    {
+      "match": { "taskType": "workflow_exploration" },
+      "set": {
+        "visual_guard.hard_enforce": false,
+        "visual_guard.soft_enforce": true
+      },
+      "expiresAt": "2026-09-20T00:00:00Z",
+      "reason": "Initial exploration rollout"
+    }
+  ]
+}

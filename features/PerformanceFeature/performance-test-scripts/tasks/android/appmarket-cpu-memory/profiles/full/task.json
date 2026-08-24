@@ -1,0 +1,123 @@
+{
+  "id": "appmarket-default",
+  "name": "应用市场完整性能测试",
+  "description": "启动应用市场并执行完整流程；支持标准验收（5 秒 CPU/PSS）与实时诊断（CPU 500ms、RSS 1 秒、PSS 5 秒、Perfetto 结束校验）。",
+  "category": "Android · 应用市场",
+  "tags": ["CPU", "内存", "完整流程", "真机"],
+  "version": "1.1.0",
+  "enabled": true,
+  "runner": "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/runner.py",
+  "sourceFiles": [
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/runner.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/appmarket_perf_runner.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/android_app_perf_sampler.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/appmarket_flow.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/analyze_appmarket_perf.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/perfetto_cpu_validator.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/performance_pdf_report.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/performance_json_io.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_flow_config.json",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_perfetto.pbtxt",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_perfetto_validation.pbtxt",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/diagnostics/appmarket_cpu_validation.sql",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/requirements.txt"
+  ],
+  "run": {
+    "executeFlow": true
+  },
+  "flow": {},
+  "workflow": {
+    "steps": [
+      { "key": "launch", "label": "启动并等待首页", "eventSteps": ["launch", "select_home"], "modes": ["full", "launch-only"] },
+      { "key": "detail", "label": "进入应用详情", "eventSteps": ["scroll_catalog", "open_detail"], "modes": ["full"] },
+      { "key": "scroll", "label": "下滑至详情底部", "eventSteps": ["scroll_detail"], "modes": ["full"] },
+      { "key": "install", "label": "下载并安装", "eventSteps": ["download_install", "installer_confirm"], "modes": ["full"] },
+      { "key": "home", "label": "返回应用市场首页", "eventSteps": ["return_home"], "modes": ["full"] },
+      { "key": "mine", "label": "进入“我的”页面", "eventSteps": ["open_my"], "modes": ["full"] },
+      { "key": "menus", "label": "浏览二级菜单", "eventSteps": ["browse_menu"], "modes": ["full"] },
+      { "key": "flow", "label": "自动化脚本结束", "eventSteps": ["flow"], "modes": ["full", "launch-only"] }
+    ]
+  },
+  "ui": {
+    "schemaVersion": 1,
+    "defaultView": "acceptance-dashboard",
+    "runSections": [
+      {
+        "id": "formal-live",
+        "kind": "live",
+        "label": "实时采样",
+        "title": "正式 CPU / 内存实时数据",
+        "description": "标准验收与实时诊断都保留正式 5 秒 CPU/PSS 轨道，图表随脚本输出即时更新。",
+        "source": "samples",
+        "samplingModes": ["standard", "realtime"],
+        "metrics": [
+          { "key": "cpu_device_normalized_pct", "label": "CPU（单核口径）", "unit": "%", "color": "#f472b6", "decimals": 2 },
+          { "key": "cpu_one_core_equiv_pct", "label": "CPU（多核累计）", "unit": "%", "color": "#22d3ee", "decimals": 2 },
+          { "key": "pss_mb", "label": "PSS", "unit": "MiB", "color": "#60a5fa", "decimals": 2 },
+          { "key": "rss_mb", "label": "RSS", "unit": "MiB", "color": "#a78bfa", "decimals": 2 }
+        ],
+        "emptyText": "等待脚本输出首个正式 CPU/PSS 样本"
+      },
+      {
+        "id": "diagnostic-live",
+        "kind": "live",
+        "label": "高频诊断",
+        "title": "实时诊断 CPU / RSS 高频数据",
+        "description": "仅实时诊断模式显示：CPU 500ms、RSS 1 秒；PSS 仍以正式 5 秒轨道为准。",
+        "source": "diagnosticSamples",
+        "samplingModes": ["realtime"],
+        "metrics": [
+          { "key": "cpu_device_normalized_pct", "label": "CPU（500ms）", "unit": "%", "color": "#22d3ee", "decimals": 2 },
+          { "key": "rss_mb", "label": "RSS（1秒）", "unit": "MiB", "color": "#a78bfa", "decimals": 2 }
+        ],
+        "emptyText": "等待实时诊断采集器输出 CPU/RSS 数据"
+      },
+      {
+        "id": "workflow",
+        "kind": "workflow",
+        "label": "完整测试工作流",
+        "title": "应用市场完整性能测试工作流",
+        "description": "启动、详情、下载安装、返回首页及“我的”菜单流程均来自本轮冻结的 task.json。",
+        "showInHistory": true
+      }
+    ],
+    "views": [
+      {
+        "id": "acceptance-dashboard",
+        "kind": "dashboard",
+        "label": "验收指标",
+        "title": "应用市场 CPU / 内存验收指标"
+      },
+      {
+        "id": "raw-samples",
+        "kind": "table",
+        "label": "原始采样与产物",
+        "title": "CPU / 内存逐点原始数据",
+        "description": "表格列、顺序及关联产物由当前脚本声明。",
+        "source": "samples",
+        "columns": [
+          { "key": "sample_index", "label": "序号", "unit": "", "decimals": 0 },
+          { "key": "target_elapsed_s", "label": "目标时间", "unit": "s", "decimals": 2 },
+          { "key": "actual_elapsed_s", "label": "实际时间", "unit": "s", "decimals": 2 },
+          { "key": "cpu_device_normalized_pct", "label": "CPU 单核口径", "unit": "%", "decimals": 4 },
+          { "key": "cpu_one_core_equiv_pct", "label": "CPU 多核累计", "unit": "%", "decimals": 4 },
+          { "key": "pss_mb", "label": "PSS", "unit": "MiB", "decimals": 4 },
+          { "key": "rss_mb", "label": "RSS", "unit": "MiB", "decimals": 4 },
+          { "key": "pids", "label": "PID 集", "unit": "", "decimals": 0 },
+          { "key": "process_names", "label": "进程集", "unit": "", "decimals": 0 },
+          { "key": "note", "label": "备注", "unit": "", "decimals": 0 }
+        ],
+        "artifactKeys": ["metrics_csv", "sampler_raw_commands", "diagnostic_metrics", "realtime_stream", "device_info", "effective_config", "flow_events", "flow_result", "logcat", "manifest"],
+        "emptyText": "本轮尚未输出 CPU / 内存逐点数据"
+      },
+      {
+        "id": "full-report",
+        "kind": "report",
+        "label": "完整测试报表",
+        "title": "应用市场完整性能测试报表",
+        "artifactKeys": ["report_json", "report_md", "report_pdf_summary", "report_pdf_detailed", "optimization_advice", "perfetto_cpu_validation", "platform_payload"],
+        "emptyText": "完整流程分析结束后生成报表"
+      }
+    ]
+  }
+}

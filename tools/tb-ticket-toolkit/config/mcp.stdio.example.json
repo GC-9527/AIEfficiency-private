@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "tb-ticket-mcp": {
+      "command": "node",
+      "args": ["<repo>/tools/tb-ticket-toolkit/mcp/tb-ticket-mcp/src/index.js"],
+      "env": {
+        "TB_TOOLKIT_PROFILE": "read",
+        "TB_TOOLKIT_REPO": "<target-repository>",
+        "TB_MCP_APP_ID": "<from-secret-store>",
+        "TB_MCP_APP_SECRET": "<from-secret-store>",
+        "TB_MCP_ORG_ID": "<organization-id>",
+        "TB_WEB_COOKIE": "<from-secret-store>"
+      }
+    }
+  }
+}
+

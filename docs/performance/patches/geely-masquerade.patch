@@ -1,0 +1,65 @@
+diff --git a/sample/app-market/src/avatr8678/java/com/appmarket/automotive/Avatr8678PlatformBridge.kt b/sample/app-market/src/avatr8678/java/com/appmarket/automotive/Avatr8678PlatformBridge.kt
+index 24115d261..86c2c806c 100644
+--- a/sample/app-market/src/avatr8678/java/com/appmarket/automotive/Avatr8678PlatformBridge.kt
++++ b/sample/app-market/src/avatr8678/java/com/appmarket/automotive/Avatr8678PlatformBridge.kt
+@@ -160,6 +160,13 @@ class Avatr8678PlatformBridge(private val context: Context) : IPlatformBridge, I
+      * 系统未提供该属性时（例如台架、模拟器）返回空串，由上层使用方决定 fallback 策略。
+      */
+     override fun region(): String {
++        // TEMP-GEELY-MASQUERADE: 真实链路 resolveRegionReal() 照常执行（SDK 预热 + 覆盖/SDK/sysprop/车型默认链，
++        // 保证方法耗时准确），仅最终返回值替换为 SA。测完还原：删掉本方法体两行 + 把 resolveRegionReal 改名回 region。
++        @Suppress("UNUSED_VARIABLE") val real = resolveRegionReal()
++        return "SA"
++    }
++
++    private fun resolveRegionReal(): String {
+         ensureDeviceIdentityStarted()
+         ptLog("region() called (SDK warmed=${cachedCountryCode != null})")
+         // 0) 运行时覆盖(debug.appmarket.region)：最高优先,改国家码不重启/不重打包
+@@ -192,7 +199,11 @@ class Avatr8678PlatformBridge(private val context: Context) : IPlatformBridge, I
+         return fallback
+     }
+ 
+-    override fun brand(): String = Build.BRAND
++    // TEMP-GEELY-MASQUERADE: 真实读取 Build.BRAND 照常执行，仅最终返回替换为 GEELYGALAXY。测完还原为 = Build.BRAND。
++    override fun brand(): String {
++        @Suppress("UNUSED_VARIABLE") val real = Build.BRAND
++        return "GEELYGALAXY"
++    }
+ 
+     /**
+      * 车型码：反射读取 `com.avatr.system.SystemConfig.CONFIG_VEHICLE_MODLE`
+@@ -204,9 +215,17 @@ class Avatr8678PlatformBridge(private val context: Context) : IPlatformBridge, I
+      * 反射失败（jar 未装、ClassNotFound、字段读失败）时直接返回空串，**不做 [Build.MODEL] 兜底** ——
+      * 让上层业务自行处理"车型码不可用"，避免拿到 `Build.MODEL` 这种 ROM 自带值误判为合法车型码。
+      */
+-    override fun model(): String = resolveVehicleModel()
++    // TEMP-GEELY-MASQUERADE: 真实链路 resolveVehicleModel()(SDK 预热/反射) 照常执行（保证方法耗时准确），
++    // 仅最终返回替换为 L946。测完还原为 = resolveVehicleModel()。
++    override fun model(): String {
++        @Suppress("UNUSED_VARIABLE") val real = resolveVehicleModel()
++        return "L946"
++    }
+ 
+-    override fun modelOnly(): String = resolveVehicleModel()
++    override fun modelOnly(): String {
++        @Suppress("UNUSED_VARIABLE") val real = resolveVehicleModel()
++        return "L946"
++    }
+ 
+     /** 车型码：优先用 SDK(sdk-avatr8678-impl)预热值,未命中回退本桥直接反射(同源)。 */
+     private fun resolveVehicleModel(): String {
+diff --git a/sample/app-market/src/avatr8678/java/com/appmarket/automotive/utils/Constant.kt b/sample/app-market/src/avatr8678/java/com/appmarket/automotive/utils/Constant.kt
+index 182d18751..044f921de 100644
+--- a/sample/app-market/src/avatr8678/java/com/appmarket/automotive/utils/Constant.kt
++++ b/sample/app-market/src/avatr8678/java/com/appmarket/automotive/utils/Constant.kt
+@@ -2,7 +2,8 @@ package com.appmarket.automotive.utils
+ class Constant {
+     companion object {
+         const val BAIC_BRAND = "qti"
+-        const val CHANNEL_FLAG = "avatr"
++        // TEMP-GEELY-MASQUERADE: 临时伪装吉利渠道走生产后端测试（原值 "avatr"），测完还原。
++        const val CHANNEL_FLAG = "geely"
+         const val TYPE_HOME = "nav_home"
+         const val TYPE_MINE = "nav_profile"
+         const val DOMAIN_YOUTUBE = "m.youtube.com"

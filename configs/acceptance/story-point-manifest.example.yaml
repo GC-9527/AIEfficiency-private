@@ -1,0 +1,91 @@
+schema_version: 1
+protocol_version: "4.1"
+
+task_origin: RUNTIME_STORY_POINT
+scope_kind: STORY_DELIVERY
+
+story_point:
+  id: SP-00000
+  title: ""
+  change_type: DEFECT_FIX
+  risk_tier: STORY-STANDARD
+  primary_source_index: 0
+  sources:
+    - system: jira
+      issue_id: DEMO-1
+      url: ""
+      issue_type: Bug
+      status: Open
+      fetched_at: ""
+      snapshot_hash: ""
+      mapping_version: "1"
+  related_source_indices: []
+  source_materials:
+    read: []
+    unread: []
+  acceptance_criteria: []
+  forbidden_scope: []
+
+candidates:
+  - repository: ""
+    base_ref: ""
+    head_ref: ""
+    diff_hash: ""
+    dependency_hash: ""
+    config_hash: ""
+    flavor_or_variant: ""
+    artifact_path: ""
+    artifact_hash: ""
+
+runtime_context:
+  environment_id: ""
+  backend_id: ""
+  database_id: ""
+  device_or_appmock_id: ""
+  external_service_versions: {}
+
+claims:
+  - id: C-001
+    type: UNKNOWN
+    statement: ""
+    evidence_ids: []
+
+behavior_baseline:
+  expected_behavior: ""
+  observed_behavior: ""
+  reproduction_status: UNKNOWN
+  steps: []
+  evidence_ids: []
+
+root_cause_or_rationale:
+  causal_chain: []
+  competing_hypotheses: []
+  evidence_ids: []
+
+behavior_contract:
+  must_change: []
+  must_preserve: []
+
+impact_matrix:
+  direct_consumers: {status: UNKNOWN, basis: ""}
+  boundary_and_errors: {status: UNKNOWN, basis: ""}
+  state_lifecycle_concurrency: {status: UNKNOWN, basis: ""}
+  data_cache_migration: {status: UNKNOWN, basis: ""}
+  permission_security_privacy: {status: UNKNOWN, basis: ""}
+  network_timeout_retry: {status: UNKNOWN, basis: ""}
+  api_sdk_compatibility: {status: UNKNOWN, basis: ""}
+  flavor_device_platform: {status: UNKNOWN, basis: ""}
+  build_package_install_upgrade: {status: UNKNOWN, basis: ""}
+  performance_resources: {status: UNKNOWN, basis: ""}
+  observability_recovery_rollback: {status: UNKNOWN, basis: ""}
+  harness_connector_false_results: {status: UNKNOWN, basis: ""}
+
+gates: []
+findings: []
+repair_rounds: 0
+residual_risks: []
+
+decision:
+  story_point: PARTIAL
+  source_sync_decision: MANUAL_APPROVAL
+  source_sync_status: NOT_ATTEMPTED

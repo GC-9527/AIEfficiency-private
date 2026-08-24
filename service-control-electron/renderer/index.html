@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIEfficiency Service Control</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="header">
+        <div>
+          <h1>AIEfficiency</h1>
+          <p id="subtitle">gateway + web-dashboard</p>
+        </div>
+        <div class="headerControls">
+          <div id="envSwitch" class="envSwitch" aria-label="Environment"></div>
+          <button id="addDevBtn" type="button" class="ghost compact">Add Dev</button>
+        </div>
+      </section>
+
+      <section class="repoBar">
+        <div>
+          <div class="label">Repository</div>
+          <div id="repoText" class="repoText">Not configured</div>
+        </div>
+        <button id="chooseRepo" class="ghost">Choose</button>
+      </section>
+
+      <section class="status">
+        <div id="dot" class="dot"></div>
+        <div>
+          <div id="statusText" class="statusText">Reading status</div>
+          <div id="detailText" class="detailText">Please wait</div>
+        </div>
+      </section>
+
+      <section id="attentionPanel" class="attentionPanel" role="alert" aria-live="polite">
+        <div class="attentionTitle">⚠ 需要用户关注</div>
+        <div id="attentionText" class="attentionText"></div>
+        <div id="attentionActions" class="attentionActions"></div>
+      </section>
+
+      <div id="urlText" class="urlText"></div>
+
+      <section class="actions primary">
+        <button id="startBtn" class="blue">Start</button>
+        <button id="stopBtn" class="red">Stop</button>
+        <button id="restartBtn" class="purple">Restart</button>
+        <button id="openWebBtn" class="green">Web</button>
+        <button id="buildBtn" class="buildButton">编译</button>
+      </section>
+
+      <section class="actions secondary">
+        <button id="openDesktopBtn">Desktop</button>
+        <button id="logsBtn">Logs</button>
+        <button id="repoBtn">Open Repo</button>
+        <button id="copyBtn">Copy URL</button>
+        <button id="removeDevBtn" class="dangerGhost">Remove Dev</button>
+      </section>
+
+      <section id="syncPanel" class="syncPanel">
+        <div class="syncHeader">
+          <div class="syncHeaderText">
+            <div class="syncTitleRow">
+              <div class="syncTitle">Sync Development Data</div>
+              <span id="syncCount" class="syncCountBadge">0 selected</span>
+            </div>
+            <div id="syncHint" class="syncHint">Configure target paths before syncing.</div>
+          </div>
+          <div class="syncActions">
+            <div class="syncActionGroup">
+              <button id="chooseProdRepoBtn" class="ghost">Production Path</button>
+              <button id="chooseDesktopRuntimeBtn" class="ghost">Desktop Path</button>
+            </div>
+            <div class="syncActionGroup">
+              <button id="syncToProdBtn" class="orange">Sync Production</button>
+              <button id="syncToDesktopBtn" class="orange">Sync Desktop</button>
+            </div>
+          </div>
+        </div>
+        <div class="syncGrid">
+          <div class="syncGroup">
+            <div class="syncGroupTitle">Shared database</div>
+            <label class="syncItem"><input type="checkbox" data-sync-key="sharedProjectDefs" /><span class="syncItemText">Repository definitions</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="adminUsers" /><span class="syncItemText">Admin / repository contacts</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="sharedDingtalkMsgConfig" /><span class="syncItemText">Shared DingTalk config</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="keywordMappings" /><span class="syncItemText">Keyword mappings</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="vehicleMap" /><span class="syncItemText">Vehicle source mappings</span></label>
+            <label class="syncItem">
+              <input id="replaceVehicleMap" type="checkbox" />
+              <span class="syncItemBody">
+                <span class="syncItemText">Replace target vehicle mappings</span>
+                <span class="syncItemDesc">Destructive: delete target-only vehicles. Leave unchecked for the safe merge default.</span>
+              </span>
+            </label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="statusMap" /><span class="syncItemText">Status mappings</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="configMemory" /><span class="syncItemText">Config memory</span></label>
+            <label class="syncItem"><input type="checkbox" data-sync-key="lessons" /><span class="syncItemText">Lessons library</span></label>
+          </div>
+          <div class="syncGroup">
+            <div class="syncGroupTitle">Gateway configuration</div>
+            <label class="syncItem">
+              <input type="checkbox" data-sync-key="apiEngines" />
+              <span class="syncItemBody">
+                <span class="syncItemText">API engines</span>
+                <span class="syncItemDesc">Sync all engine definitions (baseUrl / apiKey / model). Incremental merge; target-only engines kept. apiKey synced in plaintext.</span>
+              </span>
+            </label>
+          </div>
+          <div class="syncGroup">
+            <div class="syncGroupTitle">Local-only settings</div>
+            <p class="syncHint">Project paths, clone parent directories, and repository bindings stay in each checkout. Move them with DevBench export/import when needed.</p>
+          </div>
+        </div>
+        <div class="syncConfirm">
+          <input id="syncConfirmInput" placeholder="Type SYNC to confirm" />
+          <button id="syncSelectAllBtn">Select All</button>
+          <button id="syncClearBtn">Clear</button>
+        </div>
+        <div id="syncResult" class="syncResult"></div>
+      </section>
+
+      <section class="logPreview">
+        <pre id="logText">Logs will be written under docs/tempFiles/service-control.</pre>
+      </section>
+
+      <section class="actions single">
+        <button id="exitBtn" class="red">Stop All And Exit</button>
+      </section>
+
+      <footer>Each environment runs on isolated ports. Production uses 3000/3001, development environments use 3100/3101, 3200/3201, and so on.</footer>
+    </main>
+
+    <div id="buildModal" class="buildModal" hidden>
+      <section class="buildDialog" role="dialog" aria-modal="true" aria-labelledby="buildTitle">
+        <header class="buildHeader">
+          <div>
+            <div class="buildEyebrow">RELEASE BUILDER</div>
+            <h2 id="buildTitle">选择编译内容</h2>
+            <p id="buildSubtitle">生成可发布文件；开发网页由 Vite 自动更新，通常无需先编译。</p>
+          </div>
+          <button id="buildCloseIcon" class="buildCloseIcon" type="button" aria-label="关闭编译窗口">×</button>
+        </header>
+
+        <div class="buildTargetGrid">
+          <label class="buildTarget">
+            <input type="checkbox" data-build-target="web" data-default-selected="true" checked />
+            <span class="buildTargetIcon web">WEB</span>
+            <span class="buildTargetBody">
+              <strong>网页</strong>
+              <small>构建 web-dashboard 静态发布文件</small>
+            </span>
+            <span class="buildCheckmark">✓</span>
+          </label>
+          <label class="buildTarget">
+            <input type="checkbox" data-build-target="desktop" data-default-selected="false" />
+            <span class="buildTargetIcon desktop">APP</span>
+            <span class="buildTargetBody">
+              <strong>桌面客户端</strong>
+              <small>构建网页并生成桌面安装包</small>
+            </span>
+            <span class="buildCheckmark">✓</span>
+          </label>
+          <label class="buildTarget">
+            <input type="checkbox" data-build-target="backend" data-default-selected="false" />
+            <span class="buildTargetIcon backend">API</span>
+            <span class="buildTargetBody">
+              <strong>Gateway 后端</strong>
+              <small>生成 Gateway 后端发布包</small>
+            </span>
+            <span class="buildCheckmark">✓</span>
+          </label>
+          <label class="buildTarget">
+            <input type="checkbox" data-build-target="service-control" data-default-selected="false" />
+            <span class="buildTargetIcon control">CTRL</span>
+            <span class="buildTargetBody">
+              <strong>Service Control</strong>
+              <small>构建网页并生成服务控制安装包</small>
+            </span>
+            <span class="buildCheckmark">✓</span>
+          </label>
+          <label class="buildTarget">
+            <input type="checkbox" data-build-target="cloud" data-default-selected="false" />
+            <span class="buildTargetIcon cloud">CLOUD</span>
+            <span class="buildTargetBody">
+              <strong>云端部署包</strong>
+              <small>组装云端部署所需的完整文件</small>
+            </span>
+            <span class="buildCheckmark">✓</span>
+          </label>
+        </div>
+
+        <section id="buildProgressPanel" class="buildProgressPanel" hidden aria-live="polite">
+          <div class="buildProgressHeading">
+            <div>
+              <strong id="buildProgressTitle">准备编译</strong>
+              <span id="buildProgressDetail"></span>
+            </div>
+            <span id="buildStatusBadge" class="buildStatusBadge">等待</span>
+          </div>
+          <div class="buildProgressTrack"><div id="buildProgressBar" class="buildProgressBar"></div></div>
+          <pre id="buildLog" class="buildLog">等待编译输出…</pre>
+        </section>
+
+        <div id="buildSelectionHint" class="buildSelectionHint">已选择 1 项 · 输出到 dist/，日志保存到 docs/tempFiles/build-logs/</div>
+        <footer class="buildFooter">
+          <button id="buildCloseBtn" type="button" class="buildCancel">取消</button>
+          <button id="buildStartBtn" type="button" class="buildStart">
+            <span>开始编译</span>
+            <span class="buildStartArrow">→</span>
+          </button>
+        </footer>
+      </section>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+version: 1
+
+# 示例配置；落地时应映射到真实任务模型和仓库路径。
+route_order:
+  - id: runtime-story-dual-scope
+    when:
+      story_point_id: present
+      changed_scope_contains_all:
+        - project_or_harness
+        - story_target
+    task_origin: RUNTIME_STORY_POINT
+    scope_kind: DUAL_SCOPE
+    protocols:
+      - runtime-story-point-assurance
+      - project-engineering-acceptance
+
+  - id: runtime-story-target
+    when:
+      story_point_id: present
+      changed_scope_contains:
+        - story_target
+      changed_scope_excludes:
+        - project_or_harness
+    task_origin: RUNTIME_STORY_POINT
+    scope_kind: STORY_DELIVERY
+    protocols:
+      - runtime-story-point-assurance
+
+  - id: runtime-story-targets-platform
+    when:
+      story_point_id: present
+      story_target_kind: platform_project
+    task_origin: RUNTIME_STORY_POINT
+    scope_kind: DUAL_SCOPE
+    protocols:
+      - runtime-story-point-assurance
+      - project-engineering-acceptance
+
+  - id: direct-engineering
+    when:
+      story_point_id: absent
+      direct_project_task: true
+    task_origin: DIRECT_ENGINEERING
+    scope_kind: PROJECT_ENGINEERING
+    protocols:
+      - project-engineering-acceptance
+
+  - id: unnormalized-source-ticket
+    when:
+      external_issue_ref: present
+      story_point_id: absent
+      direct_project_task: false
+    decision: BLOCKED_ROUTING
+    required_action: normalize_to_internal_story_point
+
+guardrails:
+  source_system_affects_protocol: false
+  source_system_affects_risk_tier: false
+  require_immutable_story_snapshot: true
+  dual_scope_requires_separate_candidates: true
+  dual_scope_requires_separate_decisions: true

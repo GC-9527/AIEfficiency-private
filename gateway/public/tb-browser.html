@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teambition 远程扫码登录</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #0a0a0a; color: #e4e4e7; font-family: ui-sans-serif, system-ui, sans-serif; }
+    #bar {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      background: #18181b; border-bottom: 1px solid #27272a; font-size: 13px;
+    }
+    #status { flex: 1; color: #a1a1aa; }
+    #status.ok { color: #4ade80; }
+    #status.err { color: #f87171; }
+    button {
+      border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+      background: #3f3f46; color: #fafafa; font-size: 12px;
+    }
+    button:hover { background: #52525b; }
+    button.danger { background: #7f1d1d; }
+    #stage {
+      position: relative; height: calc(100% - 45px); display: flex;
+      align-items: center; justify-content: center; overflow: hidden; background: #09090b;
+    }
+    #canvas {
+      max-width: 100%; max-height: 100%; cursor: crosshair;
+      background: #111; box-shadow: 0 0 0 1px #27272a;
+    }
+    #hint {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      color: #71717a; font-size: 14px; pointer-events: none;
+    }
+    #hint.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <strong>TB 远程浏览器</strong>
+    <span id="status">连接中…</span>
+    <button id="btnReload" type="button">刷新状态</button>
+    <button id="btnCancel" class="danger" type="button">取消登录</button>
+  </div>
+  <div id="stage">
+    <div id="hint">等待服务器画面…</div>
+    <canvas id="canvas" width="1280" height="800" tabindex="0"></canvas>
+  </div>
+  <script>
+    const statusEl = document.getElementById("status");
+    const hintEl = document.getElementById("hint");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    let ws = null;
+    let frameW = 1280;
+    let frameH = 800;
+    let closedBySuccess = false;
+    const bootstrap = new URLSearchParams(location.hash.replace(/^#/, ""));
+    const bootstrapToken = bootstrap.get("access_token") || "";
+    const loginChallenge = bootstrap.get("login_challenge") || "";
+    if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`);
+
+    function gatewayOrigin() {
+      return location.origin;
+    }
+
+    function wsUrl() {
+      const u = new URL(gatewayOrigin());
+      u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
+      u.pathname = "/ws";
+      return u.toString();
+    }
+
+    function wsProtocols() {
+      return /^[0-9a-f]{48}$/i.test(bootstrapToken)
+        ? ["aiefficiency.v1", `aiefficiency.auth.${bootstrapToken.toLowerCase()}`]
+        : /^[A-Za-z0-9_-]{40,100}$/.test(loginChallenge)
+          ? ["aiefficiency.v1", `aiefficiency.tb-login.${loginChallenge}`]
+          : ["aiefficiency.v1"];
+    }
+
+    function setStatus(text, cls) {
+      statusEl.textContent = text || "";
+      statusEl.className = cls || "";
+    }
+
+    function connect() {
+      ws = new WebSocket(wsUrl(), wsProtocols());
+      ws.addEventListener("open", () => {
+        ws.send(JSON.stringify({ type: "tb_browser_subscribe" }));
+        setStatus("已连接，等待画面…");
+      });
+      ws.addEventListener("message", (ev) => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type === "tb_browser_frame") {
+          drawFrame(msg.data);
+        } else if (msg.type === "tb_login_status") {
+          const d = msg.data || {};
+          const text = d.message || d.status || "";
+          if (d.status === "success") {
+            setStatus(text, "ok");
+            closedBySuccess = true;
+            setTimeout(() => { try { window.close(); } catch {} }, 1200);
+          } else if (["failed", "timeout", "cancelled"].includes(d.status)) {
+            setStatus(text, "err");
+          } else {
+            setStatus(text);
+          }
+        }
+      });
+      ws.addEventListener("close", () => {
+        if (!closedBySuccess) setStatus("连接已断开", "err");
+      });
+    }
+
+    function drawFrame(data) {
+      if (!data?.image) return;
+      const img = new Image();
+      img.onload = () => {
+        frameW = data.width || img.width || frameW;
+        frameH = data.height || img.height || frameH;
+        if (canvas.width !== img.width || canvas.height !== img.height) {
+          canvas.width = img.width;
+          canvas.height = img.height;
+        }
+        ctx.drawImage(img, 0, 0);
+        hintEl.classList.add("hidden");
+      };
+      img.src = "data:image/jpeg;base64," + data.image;
+    }
+
+    function canvasPoint(ev) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: Math.round((ev.clientX - rect.left) * scaleX),
+        y: Math.round((ev.clientY - rect.top) * scaleY),
+      };
+    }
+
+    function sendInput(payload) {
+      if (!ws || ws.readyState !== 1) return;
+      ws.send(JSON.stringify({ type: "tb_browser_input", data: payload }));
+    }
+
+    canvas.addEventListener("mousedown", (ev) => {
+      canvas.focus();
+      const p = canvasPoint(ev);
+      sendInput({ type: "mousedown", ...p, button: ev.button === 2 ? "right" : "left" });
+    });
+    canvas.addEventListener("mouseup", (ev) => {
+      const p = canvasPoint(ev);
+      sendInput({ type: "mouseup", ...p, button: ev.button === 2 ? "right" : "left" });
+    });
+    canvas.addEventListener("click", (ev) => {
+      const p = canvasPoint(ev);
+      sendInput({ type: "click", ...p, button: "left" });
+    });
+    canvas.addEventListener("mousemove", (ev) => {
+      if (ev.buttons === 0) return;
+      const p = canvasPoint(ev);
+      sendInput({ type: "mousemove", ...p, button: "left" });
+    });
+    canvas.addEventListener("wheel", (ev) => {
+      ev.preventDefault();
+      const p = canvasPoint(ev);
+      sendInput({ type: "wheel", ...p, deltaX: ev.deltaX, deltaY: ev.deltaY });
+    }, { passive: false });
+    canvas.addEventListener("contextmenu", (ev) => ev.preventDefault());
+    window.addEventListener("keydown", (ev) => {
+      if (ev.target && ev.target !== canvas && ev.target !== document.body) return;
+      sendInput({ type: "keydown", key: ev.key, code: ev.code, keyCode: ev.keyCode });
+    });
+    window.addEventListener("keyup", (ev) => {
+      sendInput({ type: "keyup", key: ev.key, code: ev.code, keyCode: ev.keyCode });
+    });
+
+    function notifyDetach() {
+      try {
+        if (ws && ws.readyState === 1) {
+          ws.send(JSON.stringify({ type: "tb_browser_detach" }));
+        }
+      } catch {}
+    }
+
+    document.getElementById("btnCancel").addEventListener("click", async () => {
+      try {
+        await fetch(gatewayOrigin() + "/api/tb-tasks/login/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ loginChallenge }),
+        });
+      } catch {}
+      setStatus("已取消", "err");
+    });
+    document.getElementById("btnReload").addEventListener("click", async () => {
+      try {
+        const r = await fetch(gatewayOrigin() + "/api/tb-tasks/login/status");
+        const j = await r.json();
+        const d = j.data || {};
+        setStatus(d.message || d.phase || d.status || "无会话", d.status === "success" ? "ok" : "");
+      } catch (e) {
+        setStatus(e.message, "err");
+      }
+    });
+
+    // 用户直接关窗口/标签时通知服务端释放会话，避免再次点击被“已有登录窗口”挡住
+    window.addEventListener("pagehide", () => {
+      if (closedBySuccess) return;
+      notifyDetach();
+    });
+    window.addEventListener("beforeunload", () => {
+      if (closedBySuccess) return;
+      notifyDetach();
+    });
+
+    connect();
+  </script>
+</body>
+</html>

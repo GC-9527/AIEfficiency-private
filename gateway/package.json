@@ -1,0 +1,37 @@
+{
+  "name": "ai-efficiency-gateway",
+  "version": "2.5.7",
+  "description": "AIEfficiency Gateway",
+  "main": "server.js",
+  "type": "module",
+  "engines": {
+    "node": "24.14.1"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:maintain": "node tools/maintain-data-db.mjs",
+    "accept": "node tools/accept.mjs",
+    "accept:validate": "node tools/validate-acceptance-v4.mjs",
+    "test": "node scripts/run-tests.mjs",
+    "test:inproc": "node --test --test-timeout=60000 test/totp.test.mjs test/node-name.test.mjs test/store.test.mjs test/devbench-userdata.test.mjs test/teambition.test.mjs test/admin-auth.test.mjs test/agent-loop.test.mjs test/capacity.test.mjs test/config-ai-mode.test.mjs test/audit.test.mjs test/log-retention.test.mjs test/prod-release.test.mjs test/cardev-adb.test.mjs test/env-diag.integration.test.mjs test/forward.integration.test.mjs test/discovery.integration.test.mjs test/discovery-client-mode.integration.test.mjs test/replicate.integration.test.mjs test/audit-replicate.integration.test.mjs test/config-admin.integration.test.mjs test/feedback.integration.test.mjs test/feedback-replicate.integration.test.mjs test/distribute.integration.test.mjs test/devmode.integration.test.mjs",
+    "test:bug-agent": "node --test services/bug-agent/__tests__/llm.smoke.test.js services/bug-agent/__tests__/security.smoke.test.js services/bug-agent/__tests__/ownership.smoke.test.js services/bug-agent/__tests__/e2e.test.js services/bug-agent/__tests__/extended.smoke.test.js services/bug-agent/__tests__/tb-adapter.smoke.test.js services/bug-agent/__tests__/llm-router.smoke.test.js services/bug-agent/__tests__/tb-fetcher.smoke.test.js"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.60.0",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jszip": "^3.10.1",
+    "node-cron": "^4.2.1",
+    "pptxgenjs": "^4.0.1",
+    "puppeteer-core": "^24.41.0",
+    "qrcode": "^1.5.4",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.0",
+    "zod": "3.25.76"
+  }
+}

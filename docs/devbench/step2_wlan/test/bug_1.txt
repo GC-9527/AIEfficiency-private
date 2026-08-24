@@ -1,0 +1,49 @@
+修复下面的故事点无法更改TB单状态
+
+# 故事点诊断 / 上下文（AIEfficiency · 工程开发 /devbench）
+> 以下是网页端某个故事点的上下文，请据此继续排查/修复问题。
+
+## 故事点
+- 标题: #CARB-12278# 【北汽】【N5】【YouTube】使用方控切换上下首，播放/暂停无响应
+- tabId: tab_1781589633509_ftw5ah　sessionId: dev_tab_1781589633509_ftw5ah
+- cliSessionId: 92dd6ff2-0e51-451e-a94d-d54dee8c8e7c　轮次: 1　状态: 运行中
+- 存档文件(含完整问答，可直接 Read): D:\workspace\xsProjects\202606\202606AppMarketBeiqi\AppMarketProjects\docs\story\【北汽】【N5】【YouTube】使用方控切换上\ask\【北汽】【N5】【YouTube】使用方控切换上.txt
+
+## 工程
+- 主工程: 202606AppMarketBeiqi → D:\workspace\xsProjects\202606\202606AppMarketBeiqi\AppMarketProjects
+- 依赖 WebApp: D:\workspace\xsProjects\202606\202606AppMarketBeiqi\WebApp
+- 目标设备: 未绑定
+- 关联工单: https://www.teambition.com/task/6a1e8053457be88efe51587b
+
+## Git 分支
+- 202606AppMarketBeiqi: release/geely-p155
+- 202606AppMarketBeiqi/WebApp: release/geely-p155
+
+## 最近对话（最后 3 条，长内容已截断，完整见存档文件）
+【Claude】
+我先分析这个工单。关键线索在评论里已经有了技术分析，但我需要核实代码现状。让我先探查工程里是否有方控/媒体广播相关的处理。
+
+发现有 `seres` flavor 实现了 HardKeyDispatcher 和语音功能。但本工单是【北汽】【N5】（baic-n5 flavor）。让我核实 flavor 结构和北汽侧是否有对应实现。
+
+`seres` flavor 有完整的方控键事件转发到 H5 的实现（`SeresHardKeyDispatcherImpl`）。这证明架构设计上方控就是要转发给 webview 播放器的。现在关键问题：北汽 baic-n5 flavor 是否有对应实现？让我核实 flavor 结构和 CarStateDispatcher 基类。
+
+北汽 baicn5 flavor 只有 `GeelyDrivingStateDispatcherImpl`（行车规制），**没有 HardKeyDispatcher**。让我核实 baicn5 的 CarDispatcherConfig 注册了什么，并对比 seres。
+
+确认了：北汽 baicn5 的 `CarDispatcherConfig` **只注册了行车规制 Dispatcher，没有 `getHardKeyStateDispatcher()`**，而 seres 是有的。让我再核实北汽侧是否有任何 adayo 广播接收处理，以及 VoiceFeatureSdkHelper 的媒体键处理，避免遗漏。
+
+`VoiceFeatureSdkHelper` 是 seres 专用的华为 VIA 语音 SDK，与北汽方控无关。关键是看北汽侧的 Initializer 是否引用了 adayo/HardKey。让我读 BaicN5Initializer。
+
+找到关键证据了。`BaicN5Initializer.kt` 第 …(截断)
+
+【Claude】
+**✅ 经甄别：确认为需在本侧修复的问题**
+
+TB 状态同步失败（状态写入失败：不能流转到该任务流状态），请稍后手动处理。
+
+👉 请在下方继续发消息让 AI 开始修复（例如「按你上面的定位开始修复并自测」）。修复完成时它会自动生成报告、把 TB 切「可提测」并沉淀经验。
+
+【我】
+按 seres 模式实现北汽方控转发并启用
+
+---
+需要完整历史时请 Read 上面的“存档文件”路径。

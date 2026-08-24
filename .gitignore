@@ -1,0 +1,240 @@
+# =========================================================
+# 依赖（不提交）
+# =========================================================
+**/node_modules/
+**/.pnpm-store/
+**/.yarn/cache/
+**/.npm/
+
+# =========================================================
+# 构建产物（不提交）
+# =========================================================
+**/dist/
+**/build/
+**/.vite/
+**/.cache/
+
+# Desktop Electron 内置/构建产物
+desktop/node-runtime/
+desktop/gateway-bundled/
+desktop/dist/
+
+# Service control packaging artifacts
+service-control-electron/node-runtime/
+service-control-electron/gateway-bundled/
+service-control-electron/dist/
+
+# Web Dashboard 构建产物
+web-dashboard/dist/
+
+# Cloud 构建产物
+cloud/dist/
+cloud/skills/
+cloud/gateway-bundle.zip
+cloud/desktop-setup.exe
+
+# 二进制安装包
+*.exe
+*.dmg
+*.AppImage
+*.blockmap
+*.msi
+*.snap
+*.deb
+*.rpm
+
+# =========================================================
+# 数据库与运行时数据（不提交）
+# =========================================================
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.sqlite
+**/*.sqlite-journal
+
+# =========================================================
+# 个人配置 / 密钥 / Cookie（不提交）
+# =========================================================
+gateway/config.json
+gateway/buried-point-db.json
+cloud/shared-config.json
+.claude/settings.local.json
+
+# 管理后台超管 TOTP 密钥（Google Authenticator），严禁提交
+**/.secrets/
+gateway/.secrets/
+
+# 跨 AI 全栈质量 SKILL：只提交 `.agents/skills` canonical 源码，
+# `.claude/skills` 为指向它的本机 junction 链接（core.symlinks=false 时 git 会递归展开为实体副本），不入库
+.claude/skills/aiefficiency-fullstack-quality/
+
+# 阿里云 CLI 凭证（CarDevTool 等子工程使用）
+**/.aliyun/
+
+# 各类环境变量
+**/.env
+**/.env.*
+!**/.env.example
+
+# =========================================================
+# 日志（不提交）
+# =========================================================
+logs/
+**/*.log
+**/log_*.txt
+**/build_prop_backup_*
+**/build_model_backup_*
+
+# =========================================================
+# 临时与个人工作输出（不提交）
+# =========================================================
+.tmp/
+**/.tmp/
+temp/
+reports/
+projects/
+demo-shop/
+songs_rag/
+
+# Gateway 运行时缓存与一次性脚本（含硬编码 secret，禁止提交）
+gateway/.tmp/
+configs/local/
+gateway/knowledge/
+gateway/scripts/*
+!gateway/scripts/run-tests.mjs
+
+# Claude/AI 临时生成的文件或脚本：统一放工程下 docs/tempFiles/（及各目录 tempFiles/），与用户文件隔离，不入库
+**/tempFiles/
+docs/tempFiles/
+
+# devbench 故事点临时产物：拖入材料(archives)与验收证据(reports：截屏/录像/trace/日志/埋点)不入库；
+# 唯独故事点「对话存档」docs/story/<slug>/ask/ 仍纳入 git（保留问答记录）。
+docs/*/archives/
+docs/story/*/archives/
+docs/*/reports/
+docs/story/*/reports/
+
+# 性能报告(PerformanceReports)体积型采集产物不入库：原始 trace/logcat/录屏/截图/CPU快照/raw 等。
+# 报告正文(txt/html/pdf/pptx)、分析 json、可复用脚本(_gen/*.py,*.js)、优化方案(result/*.md)、
+# perfetto 时间线网页(web/*.html,*.json) 仍可入库。
+docs/PerformanceReports/*/artifacts/
+docs/PerformanceReports/**/*.pftrace
+docs/PerformanceReports/**/*.mp4
+docs/PerformanceReports/**/node_modules/
+docs/PerformanceReports/*/doc/assets/screenshots/
+docs/PerformanceReports/*/doc/assets/timelines/
+docs/PerformanceReports/*/doc/assets/video/
+docs/PerformanceReports/*/doc/assets/cpu/
+docs/PerformanceReports/*/doc/assets/logs/
+
+# =========================================================
+# 打包归档（不提交）
+# =========================================================
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# =========================================================
+# IDE 与系统文件
+# =========================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================================================
+# Python 缓存（songs_rag 等）
+# =========================================================
+__pycache__/
+*.pyc
+*.pyo
+
+# =========================================================
+# Android / 车机工件（CarDevTool 等）
+# =========================================================
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+*.class
+*.iml
+*.hprof
+local.properties
+.gradle/
+.externalNativeBuild/
+.cxx/
+captures/
+proguard/
+
+# 嵌套子仓库：CarDevTool 自带独立 .git，避免父仓库当作 gitlink 提交
+CarDevTool/.git/
+# 本机外置 CarDevTool 未携带 package.json 时生成的孤立依赖锁文件
+/CarDevTool/package-lock.json
+
+# =========================================================
+# 旧 git 备份
+# =========================================================
+.git.bak*/
+
+# =========================================================
+# 知识库源数据（不入库，部署时由数据所有者提供）
+# =========================================================
+deploy/knowledge-base/importer/data/*
+!deploy/knowledge-base/importer/data/.gitkeep
+
+
+# 性能压测原始日志归档（大文件，不入库）
+perf-logs/
+
+# 性能资源集成测试隔离任务库（测试超时也不得污染工作区）
+/features/PerformanceFeature/performance-test-scripts/.test-temp/
+
+# perf-loop 运行时网关日志
+tools/perf-loop/_dev_gw_*.txt
+docs/*/archives/
+docs/story/*/archives/
+docs/*/reports/
+docs/story/*/reports/
+
+# Local capture runtime outputs
+/appmarket_*.xml
+docs/devbench/script*/output_*/
+docs/devbench/script*/probe_*.png
+docs/PerformanceReports/*/live/
+docs/PerformanceReports/*/_gen/*.png
+kill* pid=*/
+PID_AFTER=*
+
+# AI-generated temporary artifacts are local by default.
+# Users may still version a specific file with `git add -f` when needed.
+docs/tempFiles/
+docs/PerformanceReports/
+docs/devbench/script*/
+docs/devbench/day*/performance/
+docs/devbench/day*/ask_*.txt
+.reasonix/**
+
+# Local AI agent configuration and generated runtime outputs.
+reasonix.toml
+.codex/skills/story-acceptance-protocol/
+features/TrackFeature/dev/step0/run_*.pid
+features/TrackFeature/dev/step0/run_results_*.json
+features/TrackFeature/report/acceptance_*.md
+native/devbench-isolation-host/**
+.opencode/**
+
+<!-- AIEFFICIENCY_VISUAL_OPERATION_GUARD:BEGIN -->
+<!-- managed-version: 1.0.0 -->
+# AIEfficiency Visual Operation Guard runtime state
+.aievog-state/
+.ai/visual-operation-guard/state/
+*.aievog.*.bak
+<!-- AIEFFICIENCY_VISUAL_OPERATION_GUARD:END -->

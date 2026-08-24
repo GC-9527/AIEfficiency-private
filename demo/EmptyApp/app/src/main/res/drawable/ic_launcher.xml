@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 纯红方块图标（矢量，无需二进制 png）；便于在 launcher 里识别这个测试 App。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFF0000"
+        android:pathData="M0,0h108v108h-108z" />
+</vector>

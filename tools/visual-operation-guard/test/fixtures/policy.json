@@ -1,0 +1,202 @@
+{
+  "$schema": "./schemas/visual-operation-policy.schema.json",
+  "version": "1.0.0",
+  "policyId": "aiefficiency-visual-operation-guard",
+  "defaultMode": "balanced",
+  "channelOrder": [
+    "mcp",
+    "plugin",
+    "api",
+    "sdk_api",
+    "cli",
+    "shell",
+    "adb",
+    "config",
+    "environment",
+    "feature_flag",
+    "url",
+    "route",
+    "deep_link",
+    "intent",
+    "activity",
+    "dom",
+    "cdp",
+    "playwright",
+    "accessibility",
+    "uiautomator",
+    "appium",
+    "visual",
+    "human"
+  ],
+  "preflight": {
+    "requiredBeforeVisual": true,
+    "requiredFields": [
+      "targetState",
+      "successCriteria",
+      "estimatedScreenTransitions",
+      "estimatedVisualActions",
+      "coreInteractionUnderTest",
+      "chosenChannel",
+      "alternatives"
+    ],
+    "requiredCategories": [
+      {
+        "id": "structured_integration",
+        "channels": [
+          "mcp",
+          "plugin",
+          "api",
+          "sdk_api"
+        ]
+      },
+      {
+        "id": "command_or_config",
+        "channels": [
+          "cli",
+          "shell",
+          "adb",
+          "config",
+          "environment",
+          "feature_flag"
+        ]
+      },
+      {
+        "id": "direct_navigation",
+        "channels": [
+          "url",
+          "route",
+          "deep_link",
+          "intent",
+          "activity"
+        ]
+      },
+      {
+        "id": "structured_ui",
+        "channels": [
+          "dom",
+          "cdp",
+          "playwright",
+          "accessibility",
+          "uiautomator",
+          "appium"
+        ]
+      }
+    ],
+    "allowedStatuses": [
+      "available",
+      "unavailable",
+      "not_applicable"
+    ],
+    "reasonRequired": true,
+    "availableStrategyRequired": true,
+    "rejectVisualWhenHigherPriorityAvailable": true
+  },
+  "visual": {
+    "enabled": true,
+    "maxDiscoveryScreenshots": 1,
+    "maxVerificationScreenshots": 2,
+    "maxOtherScreenshots": 0,
+    "maxVisualActions": 5,
+    "maxCoordinateActions": 3,
+    "maxRetriesPerTarget": 2,
+    "maxSameScreenRepeats": 1,
+    "maxNoProgressEvents": 2,
+    "handoffWhenEstimatedScreenTransitionsGt": 5,
+    "handoffWhenEstimatedVisualActionsGt": 8,
+    "requireRegionScopedAfterDiscovery": true,
+    "denyFullScreenAfterDiscovery": true,
+    "maxVisualCostUnits": 12,
+    "costUnits": {
+      "discoveryFullscreenScreenshot": 5,
+      "discoveryRegionScreenshot": 2,
+      "verificationFullscreenScreenshot": 3,
+      "verificationRegionScreenshot": 1,
+      "otherFullscreenScreenshot": 4,
+      "otherRegionScreenshot": 2,
+      "coordinateAction": 2,
+      "nonCoordinateVisualAction": 1
+    }
+  },
+  "humanHandoff": {
+    "onAuthentication": true,
+    "onCaptcha": true,
+    "onTwoFactorAuthentication": true,
+    "onAdminAuthorization": true,
+    "onPhysicalDeviceAction": true,
+    "onIrreversibleProductionAction": true,
+    "requireCheckpoint": true,
+    "confirmationMaxActions": 1,
+    "fixedReplyRequired": true
+  },
+  "testing": {
+    "arrangeStructuredFirst": true,
+    "coreInteractionMustUseUiWhenUnderTest": true,
+    "assertStructuredFirst": true,
+    "screenshotAsEvidenceOnly": true
+  },
+  "unattended": {
+    "waitForHuman": false,
+    "status": "BLOCKED_NEEDS_HUMAN",
+    "saveCheckpoint": true,
+    "releaseResourceLocks": true,
+    "notify": true,
+    "continueOtherTasks": true
+  },
+  "audit": {
+    "enabled": true,
+    "storeScreenshotBytes": false,
+    "storeScreenFingerprint": true,
+    "redactSecrets": true,
+    "retentionDays": 30,
+    "maxTaskStateBytes": 262144
+  },
+  "modes": {
+    "balanced": {},
+    "acceptance": {
+      "visual": {
+        "maxVerificationScreenshots": 3,
+        "maxVisualActions": 6,
+        "maxVisualCostUnits": 15
+      }
+    },
+    "exploration": {
+      "visual": {
+        "maxDiscoveryScreenshots": 3,
+        "maxVerificationScreenshots": 2,
+        "maxVisualActions": 8,
+        "maxCoordinateActions": 5,
+        "maxSameScreenRepeats": 1,
+        "maxNoProgressEvents": 2,
+        "maxVisualCostUnits": 22
+      }
+    },
+    "unattended": {
+      "visual": {
+        "maxDiscoveryScreenshots": 1,
+        "maxVerificationScreenshots": 2,
+        "maxVisualActions": 4,
+        "maxVisualCostUnits": 10
+      },
+      "runtime": {
+        "unattended": true
+      }
+    },
+    "strict_ci": {
+      "visual": {
+        "enabled": false
+      },
+      "runtime": {
+        "unattended": true
+      }
+    }
+  },
+  "authorization": {
+    "ttlSeconds": 60,
+    "executionResultTtlSeconds": 3600,
+    "resultReplayTtlSeconds": 86400,
+    "maxPendingPerTask": 4,
+    "maxActivePerTask": 4,
+    "maxCompletedPerTask": 32,
+    "singleUse": true
+  }
+}

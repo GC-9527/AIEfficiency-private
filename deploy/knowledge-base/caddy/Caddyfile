@@ -1,0 +1,19 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+    encode gzip zstd
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy no-referrer-when-downgrade
+    }
+
+    # 默认走 ACME 自动签发。如需使用自带证书，取消下一行注释并把文件放到 ./caddy/certs/
+    # tls /certs/fullchain.pem /certs/privkey.pem
+
+    reverse_proxy rag-search:3001
+}

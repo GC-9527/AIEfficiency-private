@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/verification-result-v2.json",
+  "title": "Verification Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "idempotencyKey",
+    "status",
+    "conclusion",
+    "planId",
+    "environment",
+    "cases",
+    "mandatorySummary",
+    "remaining",
+    "nextStage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "verification-result-v2"
+    },
+    "contextId": {
+      "type": "string"
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "conclusion": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED"
+      ]
+    },
+    "planId": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "flavors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "buildTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deviceProfileId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "deviceMode": {
+          "enum": [
+            "REAL_TARGET",
+            "COMPATIBLE_DEVICE_APPMOCK",
+            "NO_DEVICE",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "status",
+          "receiptIds"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED",
+              "NOT_RUN"
+            ]
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "mandatorySummary": {
+      "type": "object",
+      "required": [
+        "total",
+        "passed",
+        "failed",
+        "blocked",
+        "notRun"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notRun": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "remaining": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "nextStage": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1500
+    }
+  }
+}

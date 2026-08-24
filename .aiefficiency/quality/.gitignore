@@ -1,0 +1,6 @@
+artifacts/
+reports/
+screenshots/current/
+screenshots/diff/
+skill-install.json
+*.tmp-*

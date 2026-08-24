@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "match": ["computer.screenshot", "desktop.capture", "browser.visual_snapshot"],
+      "channel": "visual",
+      "operationType": "screenshot",
+      "coordinateBased": false
+    },
+    {
+      "match": ["computer.click", "computer.type", "computer.drag", "computer.scroll"],
+      "channel": "visual",
+      "operationType": "visual_action",
+      "coordinateBased": true
+    },
+    {
+      "match": ["playwright.click", "playwright.fill", "playwright.goto"],
+      "channel": "playwright",
+      "operationType": "structured_ui",
+      "coordinateBased": false
+    },
+    {
+      "match": ["adb.shell", "adb.intent", "adb.deeplink"],
+      "channel": "adb",
+      "operationType": "structured_command",
+      "coordinateBased": false
+    },
+    {
+      "match": ["uiautomator.click", "appium.click", "accessibility.find"],
+      "channel": "accessibility",
+      "operationType": "structured_ui",
+      "coordinateBased": false
+    }
+  ],
+  "unknownToolPolicy": "classify_as_structured_but_audit",
+  "notes": "生产环境不要只按工具名正则分类；应在工具注册元数据中显式声明。"
+}

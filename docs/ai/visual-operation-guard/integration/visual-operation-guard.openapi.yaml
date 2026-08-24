@@ -1,0 +1,409 @@
+openapi: 3.1.0
+info:
+  title: AIEfficiency Visual Operation Guard API
+  version: 1.0.0
+  description: >-
+    Structured-first UI automation authorization, one-time execution, result,
+    checkpoint, and human-handoff service. Tool calls use the sequence
+    authorize -> begin -> result.
+servers:
+- url: http://127.0.0.1:18081
+security:
+- bearerAuth: []
+paths:
+  /healthz:
+    get:
+      operationId: health
+      security: []
+      responses:
+        '200':
+          description: Healthy
+  /metrics:
+    get:
+      operationId: metrics
+      responses:
+        '200':
+          description: Prometheus text metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Missing or invalid bearer token when authentication is enabled
+  /v1/tasks:
+    post:
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '409':
+          description: The taskId already exists; task budgets are never reset by duplicate create
+  /v1/tasks/{taskId}:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    get:
+      operationId: getTask
+      responses:
+        '200':
+          description: Task state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+  /v1/tasks/{taskId}/preflight:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: submitPreflight
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Preflight'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/authorize:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: authorizeTool
+      description: >-
+        Reserves a short-lived, single-use authorization. The tool must not run
+        until the authorization is consumed through /begin.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizationRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/begin:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: beginToolExecution
+      description: >-
+        Atomically consumes a single-use authorization immediately before the
+        real tool starts. A second begin call for the same authorization is denied.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeginRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/result:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: recordToolResult
+      description: Records the result for an execution already consumed through /begin.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolResult'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/checkpoint:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: saveCheckpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - checkpoint
+              properties:
+                checkpoint:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/handoff:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: requestHandoff
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandoffRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+  /v1/tasks/{taskId}/resume:
+    parameters:
+    - $ref: '#/components/parameters/TaskId'
+    post:
+      operationId: resumeAfterHandoff
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumeRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/DecisionResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    DecisionResponse:
+      description: Guard decision and latest task state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DecisionResponse'
+  schemas:
+    CreateTaskRequest:
+      type: object
+      properties:
+        taskId:
+          type: string
+        mode:
+          type: string
+          default: balanced
+        taskType:
+          type: string
+          default: generic
+        unattended:
+          type: boolean
+          default: false
+    Preflight:
+      type: object
+      required:
+      - targetState
+      - successCriteria
+      - estimatedScreenTransitions
+      - estimatedVisualActions
+      - coreInteractionUnderTest
+      - chosenChannel
+      - alternatives
+      properties:
+        targetState:
+          type: string
+          minLength: 1
+        successCriteria:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+        estimatedScreenTransitions:
+          type: integer
+          minimum: 0
+        estimatedVisualActions:
+          type: integer
+          minimum: 0
+        coreInteractionUnderTest:
+          type:
+          - string
+          - 'null'
+        chosenChannel:
+          type: string
+        sensitiveFlags:
+          type: array
+          items:
+            type: string
+        alternatives:
+          type: object
+          additionalProperties: true
+    AuthorizationRequest:
+      type: object
+      required:
+      - toolName
+      - channel
+      - operationType
+      properties:
+        toolName:
+          type: string
+          minLength: 1
+        channel:
+          type: string
+          minLength: 1
+        operationType:
+          type: string
+          enum:
+          - screenshot
+          - visual_action
+          - structured_ui
+          - structured_command
+          - structured_integration
+        screenshotKind:
+          type: string
+          enum:
+          - discovery
+          - verification
+          - other
+        regionScoped:
+          type: boolean
+        coordinateBased:
+          type: boolean
+        targetId:
+          type: string
+        estimatedRemainingActions:
+          type: integer
+          minimum: 0
+        sensitiveFlag:
+          type: string
+        handoffConfirmation:
+          type: boolean
+          description: >-
+            Set true only for the single scoped verification screenshot after a
+            human handoff resume.
+    BeginRequest:
+      type: object
+      required:
+      - authorizationId
+      properties:
+        authorizationId:
+          type: string
+          minLength: 1
+    ToolResult:
+      type: object
+      required:
+      - authorizationId
+      - success
+      - progress
+      properties:
+        authorizationId:
+          type: string
+          minLength: 1
+        success:
+          type: boolean
+        progress:
+          type: boolean
+        screenFingerprint:
+          type: string
+        checkpoint:
+          type: string
+        completed:
+          type: boolean
+        actualUsage:
+          type: object
+          properties:
+            inputImageTokens:
+              type: integer
+              minimum: 0
+    HandoffRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+        stayAt:
+          type: string
+        reply:
+          type: string
+        checkpoint:
+          type: string
+    ResumeRequest:
+      type: object
+      required:
+      - confirmed
+      - userReply
+      properties:
+        confirmed:
+          type: boolean
+          const: true
+        userReply:
+          type: string
+        checkpoint:
+          type: string
+    Decision:
+      type: object
+      required:
+      - allowed
+      - code
+      - reason
+      - taskId
+      - at
+      properties:
+        allowed:
+          type: boolean
+        code:
+          type: string
+        reason:
+          type: string
+        taskId:
+          type: string
+        at:
+          type: string
+          format: date-time
+        authorizationId:
+          type: string
+        executionId:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        resultExpiresAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        handoff:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    DecisionResponse:
+      type: object
+      required:
+      - decision
+      - state
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        state:
+          type: object
+          additionalProperties: true
+    TaskResponse:
+      type: object
+      required:
+      - taskId
+      - state
+      properties:
+        taskId:
+          type: string
+        state:
+          type: object
+          additionalProperties: true

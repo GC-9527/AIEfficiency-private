@@ -1,0 +1,6 @@
+interface:
+  display_name: "AIEfficiency 全栈质量门禁"
+  short_description: "防止 UI 遮挡变形、性能和全栈契约回归"
+  default_prompt: "使用 AIEfficiency 全栈质量门禁分析影响范围，以最小改动完成实现，并给出真实关联回归与性能证据。"
+policy:
+  allow_implicit_invocation: true

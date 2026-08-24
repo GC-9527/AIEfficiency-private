@@ -1,0 +1,66 @@
+version: 1
+
+# 字段路径仅为示例，必须按真实连接器 payload 校准。
+canonical_story_point:
+  required:
+    - story_point_id
+    - sources
+    - source_snapshot_hash
+    - title
+    - acceptance_criteria
+    - target_repositories
+    - change_type
+  source_fields:
+    - system
+    - issue_id
+    - url
+    - issue_type
+    - status
+    - fetched_at
+    - snapshot_hash
+    - mapping_version
+
+adapters:
+  teambition:
+    idempotency_key: "teambition:{issue_id}:{updated_at}"
+    title: title
+    description: description
+    comments: comments
+    attachments: attachments
+  feishu:
+    idempotency_key: "feishu:{issue_id}:{updated_at}"
+    title: title
+    description: description
+    comments: comments
+    attachments: attachments
+  jira:
+    idempotency_key: "jira:{issue_key}:{updated_at}"
+    title: fields.summary
+    description: fields.description
+    comments: fields.comment.comments
+    attachments: fields.attachment
+  redmine:
+    idempotency_key: "redmine:{issue_id}:{updated_on}"
+    title: subject
+    description: description
+    comments: journals
+    attachments: attachments
+  manual:
+    idempotency_key: "manual:{story_point_id}:{revision}"
+    title: title
+    description: description
+    comments: comments
+    attachments: attachments
+
+conflict_policy:
+  preserve_all_values: true
+  never_silently_prefer_pass_friendly_value: true
+  require_manual_resolution_for_acceptance_criteria_conflict: true
+
+snapshot_policy:
+  immutable: true
+  content_hash: sha256
+  invalidate_on:
+    - acceptance_criteria_change
+    - target_scope_change
+    - environment_requirement_change

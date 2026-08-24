@@ -1,0 +1,71 @@
+version: 1
+
+critical_overrides:
+  change_types:
+    - authentication
+    - authorization
+    - sensitive_data
+    - database_migration
+    - concurrency_or_idempotency
+    - public_api_or_protocol
+    - public_sdk
+    - signing_or_packaging
+    - install_or_upgrade
+    - production_configuration
+    - irreversible_operation
+    - security_boundary
+  conditions:
+    - impact_scope_unknown
+    - multiple_repositories_with_unknown_compatibility
+    - multiple_flavors_or_consumers_with_unknown_compatibility
+    - cannot_reproduce_and_no_independent_oracle
+
+score:
+  blast_radius:
+    local: 0
+    module: 1
+    cross_module: 2
+    multi_product_or_sdk: 3
+  state_and_data:
+    none: 0
+    local_state: 1
+    persistent_or_shared: 2
+    sensitive_or_irreversible: 3
+  runtime_uncertainty:
+    deterministic: 0
+    environment_dependent: 1
+    device_or_external_system: 2
+  reproducibility:
+    stable: 0
+    intermittent: 1
+    not_reproduced: 2
+  coverage_gap:
+    strong_existing_tests: 0
+    partial: 1
+    weak_or_none: 2
+
+tiers:
+  STORY-FAST:
+    max_score: 2
+    require:
+      - change_type_minimum_evidence
+      - targeted_test
+      - affected_compile_or_static
+      - direct_smoke
+  STORY-STANDARD:
+    min_score: 3
+    max_score: 6
+    require:
+      - behavior_contract
+      - impact_matrix
+      - direct_boundary_adjacent_tests
+      - target_variant_build
+      - runtime_smoke
+      - readonly_evidence_review
+  STORY-CRITICAL:
+    min_score: 7
+    require:
+      - expanded_compatibility_matrix
+      - real_or_production_equivalent_environment
+      - independent_rerun_of_critical_gates
+      - rollout_monitoring_and_rollback

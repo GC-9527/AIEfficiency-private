@@ -1,0 +1,156 @@
+{
+  "$schema": "../config/project/.ai/visual-operation-guard/schemas/operation-map.schema.json",
+  "version": "1.0.0",
+  "projectId": "android-app-example",
+  "defaults": {
+    "strategyTimeoutMs": 30000,
+    "maxRetries": 1,
+    "requireVerification": true,
+    "secretsFromEnvironmentOnly": true
+  },
+  "operations": {
+    "open_country_code_page": {
+      "objective": "直接进入国家码设置页面",
+      "coreInteractionUnderTest": null,
+      "successCriteria": [
+        "当前 Activity 或页面路由为国家码页面",
+        "页面存在 country_code_list"
+      ],
+      "strategies": [
+        {
+          "id": "country-code-deeplink",
+          "channel": "deep_link",
+          "priority": 10,
+          "enabled": true,
+          "platforms": [
+            "android"
+          ],
+          "preconditions": [
+            "设备已连接",
+            "应用已安装",
+            "测试或受控构建启用 Deep Link"
+          ],
+          "command": "adb -s ${ANDROID_SERIAL} shell am start -W -a android.intent.action.VIEW -d 'aiefficiency://settings/country-code' ${APP_PACKAGE}",
+          "verify": {
+            "type": "adb_shell",
+            "command": "adb -s ${ANDROID_SERIAL} shell dumpsys activity activities | grep -F CountryCode"
+          },
+          "fallbackTo": "country-code-activity",
+          "lastVerifiedAt": null,
+          "owner": "android-platform",
+          "notes": "不在 Git 中写真实包名或设备序列号，使用环境变量。"
+        },
+        {
+          "id": "country-code-activity",
+          "channel": "activity",
+          "priority": 20,
+          "enabled": true,
+          "platforms": [
+            "android"
+          ],
+          "command": "adb -s ${ANDROID_SERIAL} shell am start -W -n ${APP_PACKAGE}/.settings.CountryCodeActivity",
+          "verify": {
+            "type": "adb_shell",
+            "command": "adb -s ${ANDROID_SERIAL} shell dumpsys activity top | grep -F CountryCodeActivity"
+          },
+          "fallbackTo": "country-code-uiautomator",
+          "lastVerifiedAt": null,
+          "owner": "android-platform"
+        },
+        {
+          "id": "country-code-uiautomator",
+          "channel": "uiautomator",
+          "priority": 30,
+          "enabled": true,
+          "platforms": [
+            "android"
+          ],
+          "selector": {
+            "resourceId": "${APP_PACKAGE}:id/country_code_entry",
+            "text": "国家码"
+          },
+          "verify": {
+            "type": "accessibility",
+            "selector": {
+              "resourceId": "${APP_PACKAGE}:id/country_code_list"
+            }
+          },
+          "fallbackTo": "country-code-visual",
+          "lastVerifiedAt": null,
+          "owner": "android-platform"
+        },
+        {
+          "id": "country-code-visual",
+          "channel": "visual",
+          "priority": 90,
+          "enabled": true,
+          "platforms": [
+            "android"
+          ],
+          "preconditions": [
+            "所有结构化策略已验证不可用",
+            "已取得 Guard 授权"
+          ],
+          "verify": {
+            "type": "region_screenshot",
+            "region": "app-content"
+          },
+          "lastVerifiedAt": null,
+          "owner": "qa"
+        }
+      ],
+      "humanHandoff": {
+        "reason": "预计导航超过视觉预算或设备存在厂商定制系统弹窗",
+        "steps": [
+          "打开应用设置",
+          "进入地区与语言",
+          "进入国家码"
+        ],
+        "stayAt": "国家码列表页面",
+        "reply": "已进入国家码页面"
+      }
+    },
+    "select_country_code_86": {
+      "objective": "选择中国 +86，并验证业务状态",
+      "coreInteractionUnderTest": "用户在 UI 中选择 +86",
+      "successCriteria": [
+        "UI 显示 +86",
+        "状态层返回 CN/+86",
+        "无崩溃和重复回调"
+      ],
+      "strategies": [
+        {
+          "id": "select-86-uiautomator",
+          "channel": "uiautomator",
+          "priority": 10,
+          "enabled": true,
+          "platforms": [
+            "android"
+          ],
+          "selector": {
+            "resourceId": "${APP_PACKAGE}:id/country_code_item",
+            "text": "+86"
+          },
+          "verify": {
+            "type": "combined",
+            "checks": [
+              {
+                "type": "accessibility",
+                "selector": {
+                  "resourceId": "${APP_PACKAGE}:id/selected_country_code",
+                  "text": "+86"
+                }
+              },
+              {
+                "type": "logcat",
+                "pattern": "CountryCodeChanged.*CN.*86"
+              }
+            ]
+          },
+          "lastVerifiedAt": null,
+          "owner": "qa"
+        }
+      ]
+    }
+  }
+}

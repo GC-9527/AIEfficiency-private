@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 500px; height: 496px;
+      background: #18181b;
+      border-radius: 12px;
+      border: 1px solid #27272a;
+      font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      color: #e4e4e7;
+      -webkit-app-region: drag;
+      overflow: hidden;
+    }
+    .container { padding: 32px; height: 100%; display: flex; flex-direction: column; }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .sub { font-size: 12px; color: #71717a; margin-bottom: 24px; }
+    .cards { display: flex; gap: 12px; flex: 1; -webkit-app-region: no-drag; }
+    .card {
+      flex: 1; padding: 20px; border-radius: 12px;
+      border: 2px solid #27272a; cursor: pointer;
+      transition: all 0.2s; display: flex; flex-direction: column;
+    }
+    .card:hover { border-color: #3b82f6; background: rgba(59,130,246,0.05); }
+    .card.selected { border-color: #3b82f6; background: rgba(59,130,246,0.1); }
+    .card .icon { font-size: 36px; margin-bottom: 12px; }
+    .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 11px; color: #71717a; line-height: 1.5; flex: 1; }
+    .card .tag { font-size: 10px; margin-top: 8px; }
+    .tag-blue { color: #3b82f6; }
+    .tag-green { color: #22c55e; }
+    .deployment-role { margin-top: 16px; -webkit-app-region: no-drag; }
+    .deployment-role .lbl { display: block; font-size: 12px; color: #a1a1aa; margin-bottom: 6px; }
+    .deployment-role select {
+      width: 100%; background: #27272a; border: 1px solid #3f3f46;
+      border-radius: 8px; padding: 7px 10px; color: #e4e4e7;
+      font-size: 12px; outline: none;
+    }
+    .deployment-role select:focus { border-color: #3b82f6; }
+    .bottom { margin-top: 10px; -webkit-app-region: no-drag; }
+    .remote-input { display: none; gap: 8px; align-items: center; }
+    .remote-input.show { display: flex; }
+    .remote-input input {
+      flex: 1; background: #27272a; border: 1px solid #3f3f46;
+      border-radius: 8px; padding: 8px 12px; color: #e4e4e7;
+      font-size: 13px; outline: none; font-family: monospace;
+    }
+    .remote-input input:focus { border-color: #3b82f6; }
+    .btn {
+      padding: 8px 20px; border-radius: 8px; border: none;
+      font-size: 13px; cursor: pointer; font-weight: 500;
+      transition: all 0.2s; -webkit-app-region: no-drag;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+    .note { font-size: 10px; color: #52525b; margin-top: 6px; }
+    .status { font-size: 11px; margin-top: 8px; min-height: 16px; }
+    .status.ok { color: #22c55e; }
+    .status.err { color: #ef4444; }
+    .status.loading { color: #f59e0b; }
+    .btn-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>&#x1F916; AI &#x5DE5;&#x4F5C;&#x63D0;&#x6548;</h1>
+    <p class="sub">第一步：选择页面来源（两种方式都会启动本地网关）</p>
+
+    <div class="cards">
+      <div class="card" id="card-standalone" onclick="selectMode('standalone')">
+        <div class="icon">&#x1F4BB;</div>
+        <h3>本地页面</h3>
+        <p>使用安装包内置页面<br>Skills 和配置保存在本机<br>无团队面板也可使用</p>
+        <div class="tag tag-blue">推荐个人或单机使用</div>
+      </div>
+      <div class="card" id="card-team" onclick="selectMode('team')">
+        <div class="icon">&#x1F310;</div>
+        <h3>团队云端页面</h3>
+        <p>页面从团队服务加载<br>共享 Skills、配置和任务<br>CLI 引擎仍在本机运行</p>
+        <div class="tag tag-green">适合连接团队面板</div>
+      </div>
+    </div>
+
+    <div class="deployment-role">
+      <label class="lbl" for="deployment-role">第二步：本机用途（部署角色，与设置页一致）</label>
+      <select id="deployment-role" onchange="selectDeploymentRole(this.value)">
+        <option value="standalone">全功能（本机开发 + 可提供中心服务，推荐）</option>
+        <option value="server">仅服务端（可提供中心服务，无本机开发页面）</option>
+        <option value="node">仅客户端（本机开发，不提供中心服务）</option>
+      </select>
+    </div>
+    <p class="note" id="role-note">全功能：保留本机开发页面，默认使用本机 AI；需要时可在设置中开启对外服务。</p>
+
+    <div class="bottom">
+      <div class="remote-input" id="remote-input">
+        <input type="text" id="cloud-url" value="http://192.168.10.156:8080">
+        <button class="btn btn-primary" id="btn-connect" onclick="testAndConnect()">&#x8FDE;&#x63A5;</button>
+      </div>
+      <p class="note" id="note"></p>
+      <div class="status" id="status"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-start" onclick="confirmStart()" style="display:none;">&#x542F;&#x52A8;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedMode = null;
+    let selectedDeploymentRole = 'standalone';
+
+    function selectDeploymentRole(role) {
+      selectedDeploymentRole = role;
+      const notes = {
+        standalone: '全功能：保留本机开发页面，默认使用本机 AI；需要时可在设置中开启对外服务。',
+        server: '仅服务端：提供中心 AI 和编排服务，不显示本机开发、聊天和 TB 任务页面。',
+        node: '仅客户端：保留本机开发页面，不对外提供中心服务，AI 从其它服务端获取。',
+      };
+      document.getElementById('role-note').textContent = notes[role] || '';
+    }
+
+    function selectMode(mode) {
+      selectedMode = mode;
+      document.getElementById('card-standalone').classList.toggle('selected', mode === 'standalone');
+      document.getElementById('card-team').classList.toggle('selected', mode === 'team');
+      document.getElementById('remote-input').classList.toggle('show', mode === 'team');
+      document.getElementById('btn-start').style.display = mode === 'standalone' ? 'inline-block' : 'none';
+      document.getElementById('status').textContent = '';
+      document.getElementById('note').textContent = mode === 'team'
+        ? '输入云端面板地址，Skills 和页面从云端加载，CLI 引擎走本机'
+        : '需要本机安装 Node.js 20+';
+      if (mode === 'team') {
+        setTimeout(() => document.getElementById('cloud-url').focus(), 100);
+      }
+    }
+
+    function confirmStart() {
+      window.electronAPI.selectMode({
+        mode: 'standalone',
+        cloudUrl: '',
+        deploymentRole: selectedDeploymentRole,
+      });
+    }
+
+    async function testAndConnect() {
+      const url = document.getElementById('cloud-url').value.trim().replace(/\/+$/, '');
+      if (!url) return;
+      const status = document.getElementById('status');
+      const btn = document.getElementById('btn-connect');
+
+      status.className = 'status loading';
+      status.textContent = '正在测试连接...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch(url + '/api/health', { signal: AbortSignal.timeout(5000) });
+        const data = await resp.json();
+        if (data.status === 'ok' || data.mode === 'cloud') {
+          status.className = 'status ok';
+          status.textContent = '连接成功!';
+          setTimeout(() => {
+            window.electronAPI.selectMode({
+              mode: 'team',
+              cloudUrl: url,
+              deploymentRole: selectedDeploymentRole,
+            });
+          }, 500);
+        } else {
+          throw new Error('返回异常');
+        }
+      } catch (err) {
+        status.className = 'status err';
+        status.textContent = '连接失败: ' + (err.message || '请检查地址');
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('cloud-url').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') testAndConnect();
+    });
+  </script>
+</body>
+</html>

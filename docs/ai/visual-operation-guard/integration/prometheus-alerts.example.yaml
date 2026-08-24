@@ -1,0 +1,24 @@
+groups:
+  - name: aievog
+    rules:
+      - alert: AIEVOGHighHandoffRate
+        expr: rate(aievog_handoffs_total[15m]) > 0.2
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Human handoff rate is above the expected baseline
+      - alert: AIEVOGHighServerErrorRate
+        expr: sum(rate(aievog_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(aievog_http_requests_total[5m])), 1) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Visual Operation Guard HTTP 5xx rate exceeds 1%
+      - alert: AIEVOGVisualCostSpike
+        expr: rate(aievog_visual_cost_units_total[15m]) > 10
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Visual automation cost units increased unexpectedly

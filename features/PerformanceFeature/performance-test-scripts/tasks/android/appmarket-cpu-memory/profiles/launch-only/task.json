@@ -1,0 +1,115 @@
+{
+  "id": "appmarket-launch-only",
+  "name": "应用市场启动与首页性能测试",
+  "description": "启动应用市场并等待首页稳定；支持标准5秒验收和CPU 500ms、RSS 1秒、PSS 5秒、Perfetto校验的实时诊断。",
+  "category": "Android · 应用市场",
+  "tags": ["CPU", "内存", "启动", "快速回归"],
+  "version": "1.1.0",
+  "enabled": true,
+  "runner": "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/runner.py",
+  "sourceFiles": [
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/runner.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/appmarket_perf_runner.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/android_app_perf_sampler.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/appmarket_flow.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/analyze_appmarket_perf.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/perfetto_cpu_validator.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/performance_pdf_report.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/src/performance_json_io.py",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_flow_config.json",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_perfetto.pbtxt",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/config/appmarket_perfetto_validation.pbtxt",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/diagnostics/appmarket_cpu_validation.sql",
+    "features/PerformanceFeature/performance-test-scripts/tasks/android/appmarket-cpu-memory/requirements.txt"
+  ],
+  "run": {
+    "executeFlow": false,
+    "captureScreenrecord": false,
+    "capturePerfetto": false
+  },
+  "flow": {},
+  "workflow": {
+    "steps": [
+      { "key": "launch", "label": "启动并等待首页", "eventSteps": ["launch", "select_home"], "modes": ["launch-only"] },
+      { "key": "flow", "label": "启动脚本结束", "eventSteps": ["flow"], "modes": ["launch-only"] }
+    ]
+  },
+  "ui": {
+    "schemaVersion": 1,
+    "defaultView": "launch-dashboard",
+    "runSections": [
+      {
+        "id": "launch-live",
+        "kind": "live",
+        "label": "启动实时采样",
+        "title": "启动与首页阶段 CPU / 内存实时数据",
+        "description": "仅覆盖启动并等待首页稳定的快速回归流程。",
+        "source": "samples",
+        "samplingModes": ["standard", "realtime"],
+        "metrics": [
+          { "key": "cpu_device_normalized_pct", "label": "CPU（单核口径）", "unit": "%", "color": "#f472b6", "decimals": 2 },
+          { "key": "cpu_one_core_equiv_pct", "label": "CPU（多核累计）", "unit": "%", "color": "#22d3ee", "decimals": 2 },
+          { "key": "pss_mb", "label": "PSS", "unit": "MiB", "color": "#60a5fa", "decimals": 2 },
+          { "key": "rss_mb", "label": "RSS", "unit": "MiB", "color": "#a78bfa", "decimals": 2 }
+        ],
+        "emptyText": "等待启动脚本输出首个资源样本"
+      },
+      {
+        "id": "launch-diagnostic-live",
+        "kind": "live",
+        "label": "启动高频诊断",
+        "title": "启动阶段 CPU / RSS 高频诊断",
+        "description": "仅实时诊断模式显示 CPU 500ms 与 RSS 1 秒轨道。",
+        "source": "diagnosticSamples",
+        "samplingModes": ["realtime"],
+        "metrics": [
+          { "key": "cpu_device_normalized_pct", "label": "CPU（500ms）", "unit": "%", "color": "#22d3ee", "decimals": 2 },
+          { "key": "rss_mb", "label": "RSS（1秒）", "unit": "MiB", "color": "#a78bfa", "decimals": 2 }
+        ],
+        "emptyText": "等待启动高频诊断数据"
+      },
+      {
+        "id": "launch-workflow",
+        "kind": "workflow",
+        "label": "启动工作流",
+        "title": "应用市场启动与首页性能测试工作流",
+        "description": "该 profile 只渲染启动、首页稳定与脚本结束节点。",
+        "showInHistory": true
+      }
+    ],
+    "views": [
+      {
+        "id": "launch-dashboard",
+        "kind": "dashboard",
+        "label": "启动指标",
+        "title": "应用市场启动与首页资源指标"
+      },
+      {
+        "id": "launch-raw",
+        "kind": "table",
+        "label": "启动原始数据",
+        "title": "启动阶段 CPU / 内存逐点数据",
+        "source": "samples",
+        "columns": [
+          { "key": "sample_index", "label": "序号", "unit": "", "decimals": 0 },
+          { "key": "target_elapsed_s", "label": "目标时间", "unit": "s", "decimals": 2 },
+          { "key": "cpu_device_normalized_pct", "label": "CPU 单核口径", "unit": "%", "decimals": 4 },
+          { "key": "cpu_one_core_equiv_pct", "label": "CPU 多核累计", "unit": "%", "decimals": 4 },
+          { "key": "pss_mb", "label": "PSS", "unit": "MiB", "decimals": 4 },
+          { "key": "rss_mb", "label": "RSS", "unit": "MiB", "decimals": 4 },
+          { "key": "note", "label": "备注", "unit": "", "decimals": 0 }
+        ],
+        "artifactKeys": ["metrics_csv", "sampler_raw_commands", "device_info", "effective_config", "flow_events", "flow_result", "logcat", "manifest"],
+        "emptyText": "本轮尚未输出启动阶段逐点数据"
+      },
+      {
+        "id": "launch-report",
+        "kind": "report",
+        "label": "启动测试报表",
+        "title": "应用市场启动与首页性能测试报表",
+        "artifactKeys": ["report_json", "report_md", "report_pdf_summary", "report_pdf_detailed", "optimization_advice", "platform_payload"],
+        "emptyText": "启动流程分析结束后生成报表"
+      }
+    ]
+  }
+}

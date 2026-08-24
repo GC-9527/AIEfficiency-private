@@ -1,0 +1,148 @@
+{
+  "name": "ai-efficiency-desktop",
+  "version": "1.6.11",
+  "description": "AI 工作提效 - 桌面版",
+  "main": "main.js",
+  "engines": {
+    "node": "24.14.1"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "node --test external-url.test.cjs gateway-runtime.test.cjs gateway-dependency-manager.test.cjs scripts/runtime-policy.test.cjs scripts/gateway-bundle.test.cjs scripts/verify-package.test.cjs ../web-dashboard/src/pages/devbench/taskPanelTabsModel.test.mjs",
+    "preflight": "node scripts/preflight.cjs && npm test",
+    "verify-package": "node scripts/verify-package.cjs",
+    "build-web": "cd ../web-dashboard && npm run build",
+    "prepare-gateway": "node scripts/prepare-gateway.js",
+    "prepare-node-runtime": "node scripts/prepare-node-runtime.js",
+    "prepare-release-resources": "node ../scripts/prepare-release-resources.mjs .tmp/release-resources",
+    "prepare-resources": "npm run preflight && npm run build-web && npm run prepare-gateway && npm run prepare-node-runtime && npm run prepare-release-resources",
+    "pack": "npm run prepare-resources && electron-builder --dir",
+    "dist": "npm run prepare-resources && electron-builder",
+    "dist:win": "npm run prepare-resources && electron-builder --win",
+    "dist:mac": "npm run prepare-resources && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.aiefficiency.desktop",
+    "productName": "AI提效工具",
+    "directories": {
+      "output": "dist"
+    },
+    "beforePack": "scripts/before-pack.cjs",
+    "afterPack": "scripts/after-pack.cjs",
+    "files": [
+      "main.js",
+      "preload.js",
+      "tray.js",
+      "cardev-ipc.js",
+      "external-url.js",
+      "gateway-runtime.cjs",
+      "gateway-dependency-manager.cjs",
+      "deployment-role.js",
+      "splash.html",
+      "mode-select.html",
+      "icons/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "gateway-bundled",
+        "to": "gateway",
+        "filter": [
+          "**/*",
+          "!db/data.db",
+          "!db/data.db-shm",
+          "!db/data.db-wal"
+        ]
+      },
+      {
+        "from": "../features/FeiShuProjects/src",
+        "to": "features/FeiShuProjects/src",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../features/PerformanceFeature/performance-test-scripts/tasks",
+        "to": "features/PerformanceFeature/performance-test-scripts/tasks",
+        "filter": [
+          "**/*",
+          "!**/__pycache__/**",
+          "!**/*.pyc",
+          "!**/tests/**"
+        ]
+      },
+      {
+        "from": "../web-dashboard/dist",
+        "to": "web-dist"
+      },
+      {
+        "from": ".tmp/release-resources/skills",
+        "to": "skills"
+      },
+      {
+        "from": ".tmp/release-resources/configs",
+        "to": "configs"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icons/icon.ico",
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false,
+      "extraResources": [
+        {
+          "from": "node-runtime",
+          "to": "node-runtime"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI提效工具"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icons/icon.png",
+      "category": "public.app-category.developer-tools",
+      "identity": null,
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "AI提效工具",
+      "writeUpdateInfo": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.5",
+    "to-ico": "^1.1.5"
+  }
+}

@@ -1,0 +1,65 @@
+：
+
+# 故事点诊断 / 上下文（AIEfficiency · 工程开发 /devbench）
+> 以下是网页端某个故事点的上下文，请据此继续排查/修复问题。
+
+## 故事点
+- 标题: #CARB-12278# 【北汽】【N5】【YouTube】使用方控切换上下首，播放/暂停无响应
+- tabId: tab_1781589633509_ftw5ah　sessionId: dev_tab_1781589633509_ftw5ah
+- cliSessionId: 92dd6ff2-0e51-451e-a94d-d54dee8c8e7c　轮次: 3　状态: 空闲
+- 存档文件(含完整问答，可直接 Read): D:\workspace\xsProjects\202606\202606AppMarketBeiqi\AppMarketProjects\docs\story\【北汽】【N5】【YouTube】使用方控切换上\ask\【北汽】【N5】【YouTube】使用方控切换上.txt
+
+## 工程
+- 主工程: 202606AppMarketBeiqi → D:\workspace\xsProjects\202606\202606AppMarketBeiqi\AppMarketProjects
+- 依赖 WebApp: D:\workspace\xsProjects\202606\202606AppMarketBeiqi\WebApp
+- 目标设备: 未绑定
+- 关联工单: https://www.teambition.com/task/6a1e8053457be88efe51587b
+
+## Git 分支
+- 202606AppMarketBeiqi: release/geely-p155
+- 202606AppMarketBeiqi/WebApp: release/geely-p155
+
+## 最近对话（最后 4 条，长内容已截断，完整见存档文件）
+【Claude】
+**🎉 修复完成，已按工作流处理 TB 单**
+
+TB 状态已切为「可提测」
+已写入 TB 评论（简短报告）
+已上传详细报告附件
+
+【我】
+你是否读取了TB单里面的日志，评论中的日志等所有的材料
+
+【Claude】
+您问得对——我之前**没有**读取 TB 单的日志附件和图片，只读了备注(note.md)和评论文本。让我现在补上，先看 archives 目录里实际下载了哪些材料。
+
+日志确实已下载（202606081705.txt 10.7MB、202606021451 17MB、image.png、录屏）。我之前漏读了，现在补读。先看文件类型并在大日志里检索方控相关关键字。
+
+这是完整系统 logcat。让我针对性检索方控按键的真实流转：广播下发、媒体中心转发、PhoneLink、我们的包名等关键证据。
+
+这份日志是关键证据。我看到了方控按键的真实系统流转（17:06:48，keyCode 126）。让我确认 `com.appmarket.automotive` 是否出现在接收者列表里，并核对 InputKey 提取方式，同时快速看另一份日志和图片。
+
+我已经把 TB 单的**全部材料**都读了一遍——这次补上了之前漏读的日志附件。结论：**日志反而成了本次修复最有力的证据，完全印证根因、验证修复方案正确。**
+
+我读取的材料清单：
+- ✅ `note.md` / `image.png`（重现步骤，二者内容一致）
+- ✅ `202606081705.txt`（10.7MB 系统 logcat，06-08）—— **关键证据**
+- ✅ `202606021451`（17MB 系统 logcat，06-02）—— 复现同一现象
+- ✅ 评论 8 条
+- ⚠️ `录屏_20260602_145152.mp4`（mp4 无法解析画面内容，但操作过程已由日志覆盖）
+
+## 日志关键证据（直接印证修复）
+
+两份日志里，`adayo.keyEvent.onKeyUp`（keyCode=126）广播被系统投递给以下**已注册接收者**：
+```
+com.adayo.service.sourcemn …(截断)
+
+【Claude】
+**🎉 修复完成，已按工作流处理 TB 单**
+
+TB 状态已切为「可提测」
+已写入 TB 评论（简短报告）
+已上传详细报告附件
+
+---
+需要完整历史时请 Read 上面的“存档文件”路径。

@@ -1,0 +1,48 @@
+schema_version: 1
+protocol_version: "4.1"
+
+task_origin: DIRECT_ENGINEERING
+scope_kind: PROJECT_ENGINEERING
+
+project_task:
+  id: PROJECT-00000
+  title: ""
+  change_type: FEATURE
+  mode: PROJECT-STANDARD
+  acceptance_criteria: []
+  forbidden_scope: []
+
+candidate:
+  repository: ""
+  base_ref: ""
+  head_ref: ""
+  diff_hash: ""
+  dependency_hash: ""
+  config_hash: ""
+  artifact_path: ""
+  artifact_hash: ""
+
+changed_scope:
+  modules: []
+  public_contracts: []
+  data_or_migrations: []
+  deployment_or_upgrade: []
+  acceptance_system_changed: false
+
+runtime_topology:
+  operating_systems: []
+  center_nodes: []
+  worker_nodes: []
+  browser_or_desktop_clients: []
+  environment_id: ""
+
+gates: []
+golden_story_replay: []
+findings: []
+repair_rounds: 0
+unknowns: []
+residual_risks: []
+
+decision:
+  project_change: NOT_ASSESSED
+  production_readiness: NOT_ASSESSED

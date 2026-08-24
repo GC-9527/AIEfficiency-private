@@ -1,0 +1,56 @@
+不是完全没办法。准确结论是：
+
+  - CarOccupantZoneManager 无法区分这套车机的前排和后排。
+  - Android displayId 也不能跨前后排 DHU 直接区分。
+  - 极氪 OEM 多屏 SDK 可以区分：csd 主屏、psd 副屏、ceiling 后排屏。
+
+  日志证据很明确：
+
+   日志          Android 结果          Occupant Zone    OEM 结果
+  ━━━━━━━━━━━━  ━━━━━━━━━━━━━━━━━━━━  ━━━━━━━━━━━━━━━  ━━━━━━━━━━━━━━━━━━━━
+   后排 1.txt    currentDisplayId=0    MAIN             screenType=ceiling
+  ────────────  ────────────────────  ───────────────  ────────────────────
+   前排 2.txt    currentDisplayId=0    MAIN             screenType=csd
+
+  后排日志的标准 API 结果见 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sdk/internal/features/app-mock/1.txt:272，但 OEM 明确输出了 screenType=ceiling，见 /D:/workspace/
+  xsProjects/202605/AISdkV4/2026AppMarketAIV5/sdk/internal/features/app-mock/1.txt:392。
+
+  前排同样得到 displayId=0 + MAIN，见 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sdk/internal/features/app-mock/2.txt:364，但 OEM 输出的是 screenType=csd，见 /D:/workspace/
+  xsProjects/202605/AISdkV4/2026AppMarketAIV5/sdk/internal/features/app-mock/2.txt:480。
+
+  这是因为前排 DHU 和后排 DHU 是两套独立 Android 系统，各自的本机主屏都是 displayId=0。所以 displayId 只在当前 DHU 内有效，不是全车唯一屏幕编号。
+
+  建议判断链路：
+
+  1. 不依赖 Activity，先调用已有 DeviceIdentityApi.getVehicleIdentity()：
+      - DhuType.RearDhu → 后排
+      - DhuType.FrontDhu → 前排
+
+     工程现有代码已经这样使用，见 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/src/zeekr9x/java/com/appmarket/automotive/Zeekr9xPlatformBridge.kt:602。
+
+  2. 在前排 DHU 内区分主屏和副屏，调用极氪多屏 SDK：
+
+     MultidisplayAPI.get()
+         .settingAPI
+         .getScreenType(displayId)
+
+     返回值映射：
+      - csd → 主屏
+      - psd → 副驾屏
+      - ceiling → 后排吸顶屏
+
+     工程注释也明确要求使用 getScreenType / getLogicalDisplayIdByScreenType，见 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/src/zeekr9x/java/com/appmarket/
+     automotive/multidisplay/Zeekr9xScreenMapping.kt:7。
+
+  需要注意：如果完全没有 Activity、Window、Display Context，也没有外部传入的 displayId，那么同一前排进程无法凭空判断“当前是 CSD 还是 PSD”，因为一个进程可能同时服务多个屏幕。此时要让窗口创
+  建方传入 displayId，再交给 getScreenType(displayId) 映射。
+
+  所以最终方案应是：
+
+  DeviceIdentity.dhuType
+      RearDhu  -> REAR
+      FrontDhu -> MDS.getScreenType(displayId)
+                      csd -> MAIN
+                      psd -> SECONDARY
+
+  CarOccupantZoneManager 建议只保留诊断日志，不再作为最终屏幕角色判断。

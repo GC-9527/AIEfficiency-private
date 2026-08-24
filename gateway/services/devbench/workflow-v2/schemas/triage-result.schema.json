@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/triage-result-v2.json",
+  "title": "Triage Result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contextId",
+    "contextRevision",
+    "idempotencyKey",
+    "status",
+    "classification",
+    "confidence",
+    "rootCause",
+    "claims",
+    "evidenceRead",
+    "evidenceUnread",
+    "recommendedAction",
+    "userSummary",
+    "nextStage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "triage-result-v2"
+    },
+    "contextId": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "contextRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "evidenceRead": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "receiptIds"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "receiptIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finding": {
+            "type": "string",
+            "maxLength": 1500
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidenceUnread": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "evidenceId",
+          "reason"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nextStage": {
+      "enum": [
+        "REJECT_PENDING",
+        "DIAGNOSE_PLAN",
+        "REPAIR",
+        "BLOCKED",
+        null
+      ]
+    },
+    "classification": {
+      "enum": [
+        "CLIENT_ISSUE",
+        "NON_CLIENT_ISSUE",
+        "CROSS_COMPONENT",
+        "INSUFFICIENT_EVIDENCE"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "rootCause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symptom",
+        "trigger",
+        "observedBehavior",
+        "directCause",
+        "faultOwner",
+        "workaroundOwner"
+      ],
+      "properties": {
+        "symptom": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "trigger": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "observedBehavior": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "directCause": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "faultOwner": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "workaroundOwner": {
+          "type": "string",
+          "maxLength": 1500
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "required": [
+          "text",
+          "status",
+          "evidenceFor",
+          "evidenceAgainst"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "status": {
+            "enum": [
+              "SUPPORTED",
+              "WEAK",
+              "REJECTED",
+              "UNKNOWN"
+            ]
+          },
+          "evidenceFor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidenceAgainst": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "recommendedAction": {
+      "type": "string",
+      "maxLength": 1500
+    },
+    "userSummary": {
+      "type": "string",
+      "maxLength": 500
+    }
+  }
+}

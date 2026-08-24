@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "context-budget-v2",
+  "units": "unicodeCharacters",
+  "typicalTotalMax": 20000,
+  "hardTotalMax": 28000,
+  "fields": {
+    "task.instruction": 2000,
+    "task.successCriteria": 2000,
+    "data.issue": 2000,
+    "data.latestSubstantiveComments": 2400,
+    "checkpoint": 4000,
+    "data.evidenceManifest": 6000,
+    "data.relevantMemory": 2000,
+    "data.approvedPlanOrPriorResult": 4000,
+    "data.misc": 2000
+  },
+  "selectionRules": [
+    "Never include raw assistant history; use workflow checkpoint.",
+    "Deduplicate comments, attachments and project metadata by stable ID.",
+    "Put large content behind contentRef; include only manifest and relevant summary.",
+    "Newest verified user correction supersedes older unverified claims.",
+    "When over budget, drop low-relevance memory first, then optional evidence metadata; never drop current task, required evidence, blockers or verified corrections."
+  ],
+  "toolHistory": {
+    "singleResultMax": 4000,
+    "rollingSummaryMax": 8000,
+    "recentResults": 6,
+    "artifactFullOutput": true
+  },
+  "outputLimits": {
+    "stageJson": 10000,
+    "shortReport": 100,
+    "expertHtmlFile": 150000
+  }
+}

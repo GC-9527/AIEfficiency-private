@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "task_id": "",
+  "handoff_at": "",
+  "from_agent": "",
+  "to_agent": "",
+  "repository": {
+    "root": "",
+    "branch": "",
+    "head": "",
+    "dirty_patch_hash": "",
+    "variant_or_flavor": ""
+  },
+  "goal": "",
+  "non_goals": [],
+  "risk": "",
+  "permission": "",
+  "verified_facts": [],
+  "inferred_facts": [],
+  "unknowns": [],
+  "invariants": [],
+  "selected_option": "",
+  "rejected_options": [],
+  "changed_files": [],
+  "commands_run": [],
+  "verification_results": [],
+  "residual_risks": [],
+  "next_single_action": "",
+  "resume_rule": "Re-read Git status, HEAD and dirty patch before trusting dynamic state."
+}

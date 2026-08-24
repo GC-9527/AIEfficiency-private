@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "stage-capabilities-v2",
+  "stages": {
+    "TRIAGE": {
+      "readOnly": true,
+      "allowedToolGroups": [
+        "FILES_READ",
+        "SEARCH",
+        "GIT_READ",
+        "MEDIA_INSPECT",
+        "ARCHIVE_READ"
+      ],
+      "maxToolIterations": 10
+    },
+    "DIAGNOSE_PLAN": {
+      "readOnly": true,
+      "allowedToolGroups": [
+        "FILES_READ",
+        "SEARCH",
+        "GIT_READ",
+        "MEDIA_INSPECT",
+        "ARCHIVE_READ"
+      ],
+      "maxToolIterations": 12
+    },
+    "REPAIR": {
+      "readOnly": false,
+      "allowedToolGroups": [
+        "FILES_READ",
+        "SEARCH",
+        "FILES_PATCH",
+        "GIT_READ",
+        "LOCAL_BUILD_TEST"
+      ],
+      "denied": [
+        "GIT_COMMIT",
+        "GIT_BRANCH_WRITE",
+        "ADB",
+        "TB_WRITE"
+      ],
+      "maxToolIterations": 24
+    },
+    "INDEPENDENT_REVIEW": {
+      "readOnly": true,
+      "allowedToolGroups": [
+        "FILES_READ",
+        "SEARCH",
+        "GIT_READ",
+        "RECEIPT_READ"
+      ],
+      "maxToolIterations": 10
+    },
+    "VERIFY_PLAN": {
+      "readOnly": true,
+      "allowedToolGroups": [
+        "RECEIPT_READ",
+        "TEST_TEMPLATE_READ"
+      ],
+      "maxToolIterations": 6
+    },
+    "VERIFY_EXECUTE": {
+      "readOnly": true,
+      "allowedToolGroups": [
+        "CONTROLLED_BUILD",
+        "CONTROLLED_TEST",
+        "DEVICE_PROXY",
+        "DB_QUERY",
+        "EVIDENCE_CAPTURE",
+        "RECEIPT_WRITE"
+      ],
+      "denied": [
+        "FILES_PATCH",
+        "GIT_WRITE",
+        "TB_WRITE"
+      ],
+      "maxToolIterations": 24
+    },
+    "REPORT_SHORT": {
+      "readOnly": true,
+      "allowedToolGroups": [],
+      "maxToolIterations": 0
+    },
+    "REPORT_EXPERT": {
+      "readOnly": false,
+      "allowedToolGroups": [
+        "RECEIPT_READ",
+        "ASSET_READ",
+        "REPORT_WRITE"
+      ],
+      "writeRoots": [
+        "REPORT_ROOT"
+      ],
+      "maxToolIterations": 10
+    },
+    "MEMORY_DISTILL": {
+      "readOnly": true,
+      "allowedToolGroups": [],
+      "maxToolIterations": 0
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "_说明": "复制本文件为 gateway/buried-point-db.json 并填入真实连接信息（该真实文件已被 .gitignore 忽略，不会进 git，凭据不会泄漏）。验收阶段 run-buried-point.mjs 据此到对应环境数据库查埋点：查到 (count>0) 才算该用例通过。{{QUERY}} 是查询占位符。",
+  "environments": {
+    "appmarket-mysql-示例": {
+      "mode": "mysql",
+      "host": "192.168.200.103",
+      "port": 3306,
+      "user": "<user>",
+      "password": "<password>",
+      "database": "appmarket",
+      "charset": "utf8mb4",
+      "table": "t_app_log",
+      "note": "应用市场埋点库(MySQL)。事件表 t_app_log，按 event_id 区分事件；过滤列 device_key/create_time/page_source。mysql 模式用本机 Python+pymysql，SQL 经 stdin（免装 mysql CLI、免 node 驱动）。"
+    },
+    "test-sqlite-示例": {
+      "mode": "sqlite",
+      "file": "D:/path/to/buried_points.db"
+    },
+    "test-mysql-示例": {
+      "mode": "shell",
+      "command": "mysql -hHOST -P3306 -uUSER -pPASSWORD DBNAME -N -B -e \"{{QUERY}}\"",
+      "timeoutMs": 30000
+    },
+    "prod-clickhouse-示例": {
+      "mode": "shell",
+      "command": "clickhouse-client --host HOST --user USER --password PASS --query \"{{QUERY}}\""
+    },
+    "prod-http-示例": {
+      "mode": "http",
+      "url": "https://your-analytics.example.com/api/query",
+      "method": "POST",
+      "headers": { "Authorization": "Bearer TOKEN" },
+      "bodyTemplate": { "sql": "{{QUERY}}" },
+      "rowsPath": "data.rows"
+    }
+  }
+}

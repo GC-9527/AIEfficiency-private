@@ -1,0 +1,21 @@
+{
+  "name": "@aiefficiency/visual-operation-guard",
+  "version": "1.0.0",
+  "description": "Structured-first visual automation budget and human-handoff guard",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "bin": {
+    "aievog": "./bin/aievog.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test ./test/*.test.mjs",
+    "validate": "node ./bin/aievog.mjs validate --policy ./test/fixtures/policy.json --operation-map ./test/fixtures/operation-map.json"
+  },
+  "license": "MIT"
+}

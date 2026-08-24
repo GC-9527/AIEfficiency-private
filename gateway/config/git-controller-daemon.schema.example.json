@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devbench.invalid/schemas/git-controller-daemon.schema.json",
+  "title": "DevBench protected Git Controller daemon configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "endpoint",
+    "expectedOwnIdentity",
+    "endpointAclFingerprint",
+    "gitBinaryPath",
+    "gitBinarySha256",
+    "gitBinaryAclSha256",
+    "gitProcessContainment",
+    "knownHostsPath",
+    "knownHostsSha256",
+    "knownHostsAclSha256",
+    "credentialDescriptors",
+    "dataRoot",
+    "dataRootAclSha256",
+    "storyRoot",
+    "storyRootAclSha256",
+    "registryPath",
+    "workerIdentityPolicyPath",
+    "workerSecretRoots",
+    "gatewayIdentities",
+    "humanManagerIdentities",
+    "serverPrivateKeyPath",
+    "serverPublicKeySha256",
+    "clients"
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "absoluteProtectedPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Administrator-provisioned absolute path. Runtime additionally rejects links/reparse points and unsafe owner/ACL parent chains."
+    },
+    "identity": {
+      "type": "string",
+      "pattern": "^(?:sid:S-\\d(?:-\\d+)+|uid:[0-9]+)$"
+    },
+    "gitProcessContainment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "mode",
+        "guardianPath",
+        "guardianSha256",
+        "guardianAclSha256",
+        "guardianPublicKeyPath",
+        "guardianKeyId",
+        "containerPolicyId",
+        "policyDigest"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 2 },
+        "mode": {
+          "enum": [
+            "WINDOWS_JOB_KILL_ON_CLOSE",
+            "LINUX_CGROUP_V2_SUPERVISED"
+          ]
+        },
+        "guardianPath": {
+          "$ref": "#/$defs/absoluteProtectedPath",
+          "description": "Installer/root/SYSTEM-owned native launcher/guardian that owns the Job/cgroup lifecycle. The Controller identity must not be able to replace it."
+        },
+        "guardianSha256": { "$ref": "#/$defs/sha256" },
+        "guardianAclSha256": { "$ref": "#/$defs/sha256" },
+        "guardianPublicKeyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+        "guardianKeyId": {
+          "$ref": "#/$defs/sha256",
+          "description": "SHA-256 fingerprint of the guardian Ed25519 SPKI public key."
+        },
+        "containerPolicyId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$",
+          "description": "Stable policy name only. The per-launch container epoch is generated and signed by the guardian and must never be pinned here."
+        },
+        "policyDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sshCredentialDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sshBinaryPath",
+        "sshBinarySha256",
+        "sshBinaryAclSha256",
+        "privateKeyPath",
+        "privateKeySha256",
+        "privateKeyAclSha256",
+        "knownHostsPath",
+        "knownHostsSha256",
+        "knownHostsAclSha256"
+      ],
+      "properties": {
+        "sshBinaryPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+        "sshBinarySha256": { "$ref": "#/$defs/sha256" },
+        "sshBinaryAclSha256": { "$ref": "#/$defs/sha256" },
+        "privateKeyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+        "privateKeySha256": { "$ref": "#/$defs/sha256" },
+        "privateKeyAclSha256": { "$ref": "#/$defs/sha256" },
+        "knownHostsPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+        "knownHostsSha256": { "$ref": "#/$defs/sha256" },
+        "knownHostsAclSha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Windows: fixed \\\\.\\pipe\\devbench-git-controller-* named pipe. Unix: canonical absolute path ending in .sock. Runtime applies the platform-specific validation."
+    },
+    "expectedOwnIdentity": { "$ref": "#/$defs/identity" },
+    "endpointAclFingerprint": { "$ref": "#/$defs/sha256" },
+    "gitBinaryPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "gitBinarySha256": { "$ref": "#/$defs/sha256" },
+    "gitBinaryAclSha256": { "$ref": "#/$defs/sha256" },
+    "gitProcessContainment": {
+      "$ref": "#/$defs/gitProcessContainment"
+    },
+    "knownHostsPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "knownHostsSha256": { "$ref": "#/$defs/sha256" },
+    "knownHostsAclSha256": { "$ref": "#/$defs/sha256" },
+    "credentialDescriptors": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/sshCredentialDescriptor"
+      }
+    },
+    "dataRoot": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "dataRootAclSha256": { "$ref": "#/$defs/sha256" },
+    "storyRoot": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "storyRootAclSha256": { "$ref": "#/$defs/sha256" },
+    "registryPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "workerIdentityPolicyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "workerSecretRoots": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/absoluteProtectedPath" }
+    },
+    "gatewayIdentities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identity" }
+    },
+    "humanManagerIdentities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identity" }
+    },
+    "ipcGid": { "type": "integer", "minimum": 0 },
+    "serverPrivateKeyPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+    "serverPublicKeySha256": { "$ref": "#/$defs/sha256" },
+    "clients": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["secretPath", "expectedIdentity"],
+        "properties": {
+          "secretPath": { "$ref": "#/$defs/absoluteProtectedPath" },
+          "expectedIdentity": { "$ref": "#/$defs/identity" }
+        }
+      }
+    }
+  }
+}

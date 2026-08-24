@@ -1,0 +1,64 @@
+{
+  "$schema": "../config/project/.ai/visual-operation-guard/schemas/operation-map.schema.json",
+  "version": "1.0.0",
+  "projectId": "desktop-example",
+  "defaults": {
+    "strategyTimeoutMs": 30000,
+    "maxRetries": 1,
+    "requireVerification": true,
+    "secretsFromEnvironmentOnly": true
+  },
+  "operations": {
+    "start_android_emulator": {
+      "objective": "启动指定 Android 模拟器并等待可用",
+      "coreInteractionUnderTest": null,
+      "successCriteria": [
+        "adb devices 显示 emulator online",
+        "sys.boot_completed=1"
+      ],
+      "strategies": [
+        {
+          "id": "emulator-cli",
+          "channel": "cli",
+          "priority": 10,
+          "enabled": true,
+          "platforms": [
+            "windows",
+            "linux",
+            "macos"
+          ],
+          "command": "${ANDROID_HOME}/emulator/emulator -avd ${AVD_NAME} -no-snapshot-save",
+          "verify": {
+            "type": "shell",
+            "command": "adb -s ${ANDROID_SERIAL} wait-for-device && adb -s ${ANDROID_SERIAL} shell getprop sys.boot_completed"
+          },
+          "fallbackTo": "emulator-human",
+          "lastVerifiedAt": null,
+          "owner": "android-platform"
+        },
+        {
+          "id": "emulator-human",
+          "channel": "human",
+          "priority": 100,
+          "enabled": true,
+          "platforms": [
+            "windows",
+            "linux",
+            "macos"
+          ],
+          "notes": "仅当本机 emulator CLI 不可用时请求用户从 Device Manager 启动。"
+        }
+      ],
+      "humanHandoff": {
+        "reason": "本机未找到 emulator CLI 或 AVD 仅由 Android Studio 管理",
+        "steps": [
+          "打开 Android Studio Device Manager",
+          "启动指定 AVD",
+          "等待桌面出现"
+        ],
+        "stayAt": "模拟器桌面",
+        "reply": "模拟器已启动"
+      }
+    }
+  }
+}

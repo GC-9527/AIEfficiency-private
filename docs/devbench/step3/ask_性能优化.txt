@@ -1,0 +1,40 @@
+根据故事点 “启动性能优化20260616”中的工程配置
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV5
+D:\workspace\xsProjects\202604\AIEfficiency
+D:\workspace\xsProjects\202605\AISdkV4\2026AISdkV4
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV4
+flavor avatr8678
+
+画出整体的代码架构图，就像Android的系统的架构图那样
+ppt里面列出所有提升冷启动的性能的方法与依赖以及优化前后数据对比
+以及资料的轮证材料与截图（之前的安卓车机日志）
+，生成html与报告ppt和pdf 到D:\workspace\xsProjects\202606\AIEfficiencyTrack\docs\devbench\step3
+
+=============================================================
+
+根据故事点 “启动性能优化20260616”中的工程配置
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV5
+D:\workspace\xsProjects\202604\AIEfficiency
+D:\workspace\xsProjects\202605\AISdkV4\2026AISdkV4
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV4
+flavor avatr8678
+使用html-ppt-skill生成PPT，主题是应用市场架构与启动流程
+分别报告优化前，优化后的冷启动流程，代码架构的变化
+生成文档到目录下
+
+===================================================
+根据故事点 “启动性能优化20260616”中的工程配置
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV5
+D:\workspace\xsProjects\202604\AIEfficiency
+D:\workspace\xsProjects\202605\AISdkV4\2026AISdkV4
+D:\workspace\xsProjects\202605\AISdkV4\2026AppMarketAIV4
+flavor avatr8678
+
+画出整体的代码架构图，就像Android的系统的架构图那样
+ppt里面列出所有提升冷启动的性能的方法与依赖以及优化前后数据对比
+以及资料的轮证材料与截图（之前的安卓车机日志）
+，生成报告html，ppt和pdf 到D:\workspace\xsProjects\202606\AIEfficiencyTrack\docs\devbench\step3
+注意生成的html中所引用的图片，视频，日志等都帮我拷贝到生成的目录下并且html中的引用也要改成这个目录下
+使html以及ppt，pdf中的引用正常，点击视频能够播放，图片能够点开显示全屏原尺寸图，日志也能通过引用打开
+我只需要一起复制整个生成到的目录下就可以在另外的电脑上打开，整个图文影音交互正常，请相当重视我是要像客户做商业报告
+帮我写入全局Claude配置，AI配置以及本项目配置

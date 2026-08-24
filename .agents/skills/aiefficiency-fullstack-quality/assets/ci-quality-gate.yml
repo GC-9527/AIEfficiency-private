@@ -1,0 +1,38 @@
+name: AIEfficiency Full-stack Quality
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            web-dashboard/package-lock.json
+            gateway/package-lock.json
+      - name: Install web dependencies
+        run: npm --prefix web-dashboard ci
+      - name: Install gateway dependencies
+        run: npm --prefix gateway ci
+      - name: Validate skill
+        run: node .agents/skills/aiefficiency-fullstack-quality/scripts/validate-skill.mjs
+      - name: Run standard quality gate
+        run: >-
+          node .agents/skills/aiefficiency-fullstack-quality/scripts/quality-gate.mjs
+          --repo . --base origin/${{ github.base_ref }} --mode standard
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aiefficiency-quality-evidence
+          path: .aiefficiency/quality
+          if-no-files-found: warn

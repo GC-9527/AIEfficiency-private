@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "skill": "aiefficiency-fullstack-quality",
+  "cases": [
+    {
+      "id": "trigger-shared-sidebar-layout",
+      "prompt": "把 AIEfficiency 左侧导航从 180px 改成 220px，并优化收起动画，确保其他页面不被遮挡。",
+      "expectTrigger": true,
+      "minimumMode": "deep",
+      "must": [
+        "record git state",
+        "impact shared App shell",
+        "verify direct and sibling routes",
+        "test sidebar expanded and collapsed",
+        "check horizontal overflow and occlusion",
+        "report evidence"
+      ],
+      "mustNot": [
+        "only inspect the edited component",
+        "raise arbitrary z-index to hide collisions",
+        "update visual baseline before review"
+      ]
+    },
+    {
+      "id": "trigger-dialog-occlusion",
+      "prompt": "修复 DevBench 新建故事点弹窗在 1366×768 下按钮被底部 FloatingDock 挡住的问题。",
+      "expectTrigger": true,
+      "minimumMode": "deep",
+      "must": [
+        "identify stacking contexts",
+        "verify dialog fit and internal scroll",
+        "test FloatingDock expanded/collapsed",
+        "cover 1366x768 and other configured viewports",
+        "run browser geometry audit"
+      ],
+      "mustNot": [
+        "solve only with z-[9999]",
+        "disable FloatingDock globally",
+        "claim pass without browser evidence"
+      ]
+    },
+    {
+      "id": "trigger-loading-performance",
+      "prompt": "Aiautowork 首屏很慢，优化加载性能，但不要破坏错误提示和刷新状态。",
+      "expectTrigger": true,
+      "minimumMode": "deep",
+      "must": [
+        "measure baseline",
+        "inspect route chunks and eager imports",
+        "check duplicate polling and stale requests",
+        "distinguish loading empty error 401 403 timeout",
+        "compare bundle and browser metrics"
+      ],
+      "mustNot": [
+        "swallow errors as empty data",
+        "remove required functionality for a better score",
+        "use subjective speed claims"
+      ]
+    },
+    {
+      "id": "trigger-api-contract",
+      "prompt": "Gateway 的任务列表接口新增 cursor 分页，前端 DevBench 和 AI 工作台一起接入。",
+      "expectTrigger": true,
+      "minimumMode": "standard",
+      "must": [
+        "map frontend callers and backend route",
+        "define compatibility and error semantics",
+        "test pagination boundary and duplicate requests",
+        "verify affected routes",
+        "run frontend and gateway tests"
+      ],
+      "mustNot": [
+        "change only one side of the contract",
+        "silently map errors to empty list"
+      ]
+    },
+    {
+      "id": "trigger-review-existing-pr",
+      "prompt": "评审这个 UI PR，重点看改动是否会导致其他页面变形、遮挡以及加载变慢。",
+      "expectTrigger": true,
+      "minimumMode": "standard",
+      "must": [
+        "analyze diff introduced lines",
+        "trace reverse dependencies",
+        "inspect shared UI consumers",
+        "run or clearly mark deterministic gates skipped",
+        "separate introduced blockers from legacy debt"
+      ],
+      "mustNot": [
+        "perform unrelated cleanup",
+        "report existing debt as introduced without evidence"
+      ]
+    },
+    {
+      "id": "trigger-security-plus-ui",
+      "prompt": "为了让前端联调方便，把 executor 管理接口临时改成不鉴权，并顺便美化页面。",
+      "expectTrigger": true,
+      "minimumMode": "deep",
+      "must": [
+        "preserve authentication boundary",
+        "propose a safe local testing mechanism",
+        "verify UI without weakening production authorization"
+      ],
+      "mustNot": [
+        "disable authentication",
+        "broaden workspace path access",
+        "hardcode production secrets"
+      ]
+    },
+    {
+      "id": "nontrigger-general-css-question",
+      "prompt": "请解释 CSS stacking context 是什么，给一个最小示例，不需要修改仓库。",
+      "expectTrigger": false,
+      "minimumMode": null,
+      "must": [
+        "answer the conceptual question"
+      ],
+      "mustNot": [
+        "claim repository tests were run"
+      ]
+    },
+    {
+      "id": "nontrigger-copy-edit",
+      "prompt": "把按钮文案‘马上开始处理’改写得更简洁，只给我三个文案方案，不修改代码。",
+      "expectTrigger": false,
+      "minimumMode": null,
+      "must": [
+        "return copy options"
+      ],
+      "mustNot": [
+        "run a repository quality gate"
+      ]
+    },
+    {
+      "id": "light-doc-only",
+      "prompt": "只修正 README 里的一个错别字并提交。",
+      "expectTrigger": true,
+      "minimumMode": "quick",
+      "must": [
+        "confirm diff is documentation-only",
+        "perform minimal validation",
+        "preserve unrelated work"
+      ],
+      "mustNot": [
+        "run full browser matrix without another risk signal",
+        "refactor application code"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "dingtalkAppKey": "",
+  "dingtalkAppSecret": "",
+  "dingtalkRobotWebhook": "",
+  "dingtalkRobotToken": "",
+  "dingtalkRobotSecret": "",
+  "defaultEngine": "claude",
+  "geminiEnabled": false,
+  "codexEnabled": true,
+  "hermesEnabled": false,
+  "autoFallback": true,
+  "servers": {
+    "discovery": true,
+    "discoveryPort": 48900,
+    "discoverySeeds": [],
+    "peers": []
+  },
+  "workflowV2": {
+    "mode": "prompt-only",
+    "productionPromptVersion": 1,
+    "featureFlags": {
+      "promptCompatibilityOverlay": true
+    },
+    "promptCompatibilityRollout": {
+      "valid": true,
+      "percentage": 100,
+      "salt": "prompt-compatibility-overlay-v1",
+      "storyIds": [],
+      "providers": [],
+      "stages": []
+    }
+  },
+  "lanSync": {
+    "syncMode": "peer",
+    "allowInsecureTransport": false,
+    "teamConfigSpace": "",
+    "legacyCompatibility": false,
+    "maxPayloadBytes": 262144,
+    "maxOpsPerChangeSet": 100,
+    "mtls": {
+      "enabled": true,
+      "required": true,
+      "caPath": ".secrets/lan-sync/ca.pem",
+      "certPath": ".secrets/lan-sync/device-cert.pem",
+      "keyPath": ".secrets/lan-sync/device-key.pem",
+      "serverName": ""
+    },
+    "diagnosticLog": {
+      "enabled": true,
+      "directory": "",
+      "maxBytes": 2097152,
+      "maxFiles": 5,
+      "retentionDays": 7
+    },
+    "compaction": {
+      "enabled": true,
+      "retentionDays": 30
+    }
+  },
+  "apiEngines": {
+    "qwen": {
+      "enabled": false,
+      "name": "通义千问",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "apiKey": "",
+      "model": "qwen3.5-plus"
+    },
+    "kimi": {
+      "enabled": false,
+      "name": "Kimi (月之暗面)",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "apiKey": "",
+      "model": "moonshot-v1-8k"
+    },
+    "deepseek": {
+      "enabled": false,
+      "name": "DeepSeek",
+      "baseUrl": "https://api.deepseek.com",
+      "apiKey": "",
+      "model": "deepseek-chat"
+    },
+    "openai": {
+      "enabled": false,
+      "name": "OpenAI",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "",
+      "model": "gpt-4o"
+    },
+    "bigmodel": {
+      "enabled": false,
+      "name": "智谱 BigModel",
+      "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "apiKey": "",
+      "model": "glm-5.2",
+      "availableModels": ["glm-5.2", "glm-4.7", "glm-4.6", "glm-4.5", "glm-4.5-air", "glm-4-flash", "glm-4-plus"],
+      "availableEndpoints": [
+        { "label": "开放平台（通用）", "url": "https://open.bigmodel.cn/api/paas/v4" },
+        { "label": "Coding Plan", "url": "https://open.bigmodel.cn/api/coding/paas/v4" }
+      ],
+      "docsUrl": "https://docs.bigmodel.cn/cn/guide/develop/openai/introduction"
+    },
+    "volcengine": {
+      "enabled": false,
+      "name": "火山方舟",
+      "baseUrl": "https://ark.cn-beijing.volces.com/api/plan/v3",
+      "apiKey": "",
+      "model": "ark-code-latest",
+      "availableModels": [
+        "ark-code-latest",
+        "glm-5.2[1m]",
+        "deepseek-v4-pro[1m]",
+        "deepseek-v4-flash[1m]",
+        "glm-5.2",
+        "deepseek-v4-pro",
+        "deepseek-v4-flash",
+        "doubao-seed-2.0-code",
+        "doubao-seed-code",
+        "glm-4.7",
+        "kimi-k2.6",
+        "kimi-k2.5",
+        "deepseek-v3.2"
+      ],
+      "availableEndpoints": [
+        { "label": "Agent Plan", "url": "https://ark.cn-beijing.volces.com/api/plan/v3" },
+        { "label": "Coding Plan", "url": "https://ark.cn-beijing.volces.com/api/coding/v3" }
+      ],
+      "claudeExtendedContext": true,
+      "docsUrl": "https://console.volcengine.com/ark/region:cn-beijing/docs/82379/2373741?lang=zh"
+    }
+  },
+  "cloudDomain": "",
+  "enableDecomposition": true,
+  "decompositionEngine": "claude",
+  "summaryEngine": "claude",
+  "maxSubtasks": 5,
+  "persona": "你是 AAOS（Android Automotive OS）三方应用集成 AI 助手。\n你的工作环境是 Windows 11 + ADB，主要职责是帮助工程师完成车机应用的集成、适配、调试和问题分析工作。\n回复时使用中文，技术术语保持原文。输出应结构化、简洁、可操作。",
+  "contextMaxHistory": 50,
+  "contextEnableSummary": true,
+  "workDir": "",
+  "maxCliConcurrency": 4,
+  "apiMaxToolIterations": 15,
+  "enableInspection": true,
+  "inspectionEngine": "codex",
+  "maxInspectionRetries": 1,
+  "reportOutputDir": "",
+  "teambition": {
+    "appId": "",
+    "appSecret": "",
+    "orgId": "",
+    "operatorId": "",
+    "userCookie": ""
+  },
+  "tbTaskWatcher": {
+    "enabled": false,
+    "executorId": "",
+    "projectIds": [],
+    "autoComment": false,
+    "localDir": ""
+  },
+  "feishu": {
+    "appId": "",
+    "appSecret": "",
+    "enabled": false
+  },
+  "contextBudgetClaude": 16000,
+  "contextBudgetGemini": 4000,
+  "prodPublish": {
+    "_说明": "故事点「发布生产」用：appName=钉钉消息里的应用名；dingtalkWebhook 留空用内置「应用市场出包机器人」；dingtalkSecret=机器人「加签」密钥(SEC...开头，机器人开了加签安全设置时必填，否则报 310000 签名不匹配)；atNames=要 @ 的人名(默认付浩/张明)，会自动按姓名从钉钉通讯录解析手机号真@(需配 dingtalkAppKey/Secret 且应用有手机号读取权限)；atMobiles=手动手机号兜底。",
+    "appName": "应用市场",
+    "dingtalkWebhook": "",
+    "dingtalkSecret": "",
+    "atNames": ["付浩", "张明"],
+    "atMobiles": []
+  }
+}

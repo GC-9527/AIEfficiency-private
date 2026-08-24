@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>飞书远程扫码登录</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #0a0a0a; color: #e4e4e7; font-family: ui-sans-serif, system-ui, sans-serif; }
+    #bar {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      background: #18181b; border-bottom: 1px solid #27272a; font-size: 13px;
+    }
+    #status { flex: 1; color: #a1a1aa; }
+    #status.ok { color: #4ade80; }
+    #status.err { color: #f87171; }
+    button {
+      border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+      background: #3f3f46; color: #fafafa; font-size: 12px;
+    }
+    button:hover { background: #52525b; }
+    button.primary { background: #1d4ed8; }
+    button.primary:hover { background: #2563eb; }
+    button.danger { background: #7f1d1d; }
+    #stage {
+      position: relative; height: calc(100% - 45px); display: flex;
+      align-items: center; justify-content: center; overflow: hidden; background: #09090b;
+      touch-action: none;
+    }
+    #canvas {
+      position: relative; z-index: 1;
+      max-width: 100%; max-height: 100%; cursor: crosshair;
+      background: #111; box-shadow: 0 0 0 1px #27272a;
+      touch-action: none;
+    }
+    #hint {
+      position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
+      color: #71717a; font-size: 14px; pointer-events: none;
+    }
+    #hint.hidden { display: none; }
+    #clickMark {
+      position: absolute; z-index: 3; width: 14px; height: 14px; margin: -7px 0 0 -7px;
+      border: 2px solid #38bdf8; border-radius: 50%; pointer-events: none; opacity: 0;
+      transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <strong>飞书远程浏览器</strong>
+    <span id="status">连接中…</span>
+    <button id="btnQr" class="primary" type="button">切换扫码登录</button>
+    <button id="btnOrg" class="primary" type="button">切换企业</button>
+    <button id="btnAccount" type="button">切换账号</button>
+    <button id="btnTenant" type="button">进入项目空间</button>
+    <button id="btnReload" type="button">刷新状态</button>
+    <button id="btnCancel" class="danger" type="button">取消登录</button>
+  </div>
+  <div id="stage">
+    <div id="hint">等待服务器画面…</div>
+    <canvas id="canvas" width="1440" height="900" tabindex="0"></canvas>
+    <div id="clickMark"></div>
+  </div>
+  <script>
+    const statusEl = document.getElementById("status");
+    const hintEl = document.getElementById("hint");
+    const canvas = document.getElementById("canvas");
+    const clickMark = document.getElementById("clickMark");
+    const ctx = canvas.getContext("2d");
+    let ws = null;
+    // 页面 CSS 视口尺寸（CDP 输入坐标用这个，不是 JPEG 像素尺寸）
+    let deviceW = 1440;
+    let deviceH = 900;
+    let closedBySuccess = false;
+    let pointerDown = false;
+    const bootstrapToken = new URLSearchParams(location.hash.replace(/^#/, ""))
+      .get("access_token") || "";
+    if (location.hash) history.replaceState(null, "", `${location.pathname}${location.search}`);
+
+    function gatewayOrigin() {
+      return location.origin;
+    }
+
+    function wsUrl() {
+      const u = new URL(gatewayOrigin());
+      u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
+      u.pathname = "/ws";
+      return u.toString();
+    }
+
+    function wsProtocols() {
+      return /^[0-9a-f]{48}$/i.test(bootstrapToken)
+        ? ["aiefficiency.v1", `aiefficiency.auth.${bootstrapToken.toLowerCase()}`]
+        : ["aiefficiency.v1"];
+    }
+
+    function setStatus(text, cls) {
+      statusEl.textContent = text || "";
+      statusEl.className = cls || "";
+    }
+
+    function connect() {
+      ws = new WebSocket(wsUrl(), wsProtocols());
+      ws.addEventListener("open", () => {
+        ws.send(JSON.stringify({ type: "feishu_browser_subscribe" }));
+        setStatus("已连接，等待画面…");
+      });
+      ws.addEventListener("message", (ev) => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type === "feishu_browser_frame") {
+          drawFrame(msg.data);
+        } else if (msg.type === "feishu_login_status") {
+          const d = msg.data || {};
+          const text = d.message || d.status || "";
+          if (d.status === "success") {
+            setStatus(text, "ok");
+            closedBySuccess = true;
+            setTimeout(() => { try { window.close(); } catch {} }, 1200);
+          } else if (["failed", "timeout", "cancelled"].includes(d.status)) {
+            setStatus(text, "err");
+          } else {
+            setStatus(text);
+          }
+        }
+      });
+      ws.addEventListener("close", () => {
+        if (!closedBySuccess) setStatus("连接已断开", "err");
+      });
+    }
+
+    function drawFrame(data) {
+      if (!data?.image) return;
+      const img = new Image();
+      img.onload = () => {
+        // metadata 里的 deviceWidth/Height 才是页面 CSS 坐标空间
+        if (data.width > 0) deviceW = data.width;
+        if (data.height > 0) deviceH = data.height;
+        if (canvas.width !== img.width || canvas.height !== img.height) {
+          canvas.width = img.width;
+          canvas.height = img.height;
+        }
+        ctx.drawImage(img, 0, 0);
+        hintEl.classList.add("hidden");
+      };
+      img.src = "data:image/jpeg;base64," + data.image;
+    }
+
+    /** 映射到页面 CSS 视口坐标（供 Input/page.mouse 使用） */
+    function canvasPoint(ev) {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, rect.width);
+      const h = Math.max(1, rect.height);
+      return {
+        x: Math.round((ev.clientX - rect.left) / w * deviceW),
+        y: Math.round((ev.clientY - rect.top) / h * deviceH),
+      };
+    }
+
+    function showClickMark(ev) {
+      const stage = document.getElementById("stage");
+      const rect = stage.getBoundingClientRect();
+      clickMark.style.left = (ev.clientX - rect.left) + "px";
+      clickMark.style.top = (ev.clientY - rect.top) + "px";
+      clickMark.style.opacity = "1";
+      setTimeout(() => { clickMark.style.opacity = "0"; }, 350);
+    }
+
+    function sendInput(payload) {
+      if (!ws || ws.readyState !== 1) return;
+      ws.send(JSON.stringify({ type: "feishu_browser_input", data: payload }));
+    }
+
+    // 只用 pointer 事件；抬起时发一次 click（避免 mousedown+click 叠成双击）
+    canvas.addEventListener("pointerdown", (ev) => {
+      if (ev.button !== 0 && ev.pointerType === "mouse") return;
+      ev.preventDefault();
+      canvas.focus();
+      pointerDown = true;
+      try { canvas.setPointerCapture(ev.pointerId); } catch {}
+      showClickMark(ev);
+      const p = canvasPoint(ev);
+      sendInput({ type: "mousemove", ...p, button: "left" });
+    });
+    canvas.addEventListener("pointermove", (ev) => {
+      if (!pointerDown) return;
+      const p = canvasPoint(ev);
+      sendInput({ type: "mousemove", ...p, button: "left" });
+    });
+    canvas.addEventListener("pointerup", (ev) => {
+      if (!pointerDown) return;
+      pointerDown = false;
+      const p = canvasPoint(ev);
+      showClickMark(ev);
+      sendInput({ type: "click", ...p, button: "left" });
+    });
+    canvas.addEventListener("pointercancel", () => { pointerDown = false; });
+    canvas.addEventListener("wheel", (ev) => {
+      ev.preventDefault();
+      const p = canvasPoint(ev);
+      sendInput({ type: "wheel", ...p, deltaX: ev.deltaX, deltaY: ev.deltaY });
+    }, { passive: false });
+    canvas.addEventListener("contextmenu", (ev) => ev.preventDefault());
+    window.addEventListener("keydown", (ev) => {
+      if (ev.target && ev.target !== canvas && ev.target !== document.body) return;
+      sendInput({ type: "keydown", key: ev.key, code: ev.code, keyCode: ev.keyCode });
+    });
+    window.addEventListener("keyup", (ev) => {
+      if (ev.target && ev.target !== canvas && ev.target !== document.body) return;
+      sendInput({ type: "keyup", key: ev.key, code: ev.code, keyCode: ev.keyCode });
+    });
+
+    function notifyDetach() {
+      try {
+        if (ws && ws.readyState === 1) {
+          ws.send(JSON.stringify({ type: "feishu_browser_detach" }));
+        }
+      } catch {}
+    }
+
+    document.getElementById("btnQr").addEventListener("click", () => {
+      sendInput({ type: "switch_qr" });
+      setStatus("正在切换扫码登录…");
+    });
+    document.getElementById("btnOrg").addEventListener("click", () => {
+      sendInput({ type: "open_tenant_picker" });
+      setStatus("正在打开企业选择页…");
+    });
+    document.getElementById("btnAccount").addEventListener("click", () => {
+      sendInput({ type: "switch_account" });
+      setStatus("正在打开账号中心…");
+    });
+    document.getElementById("btnTenant").addEventListener("click", () => {
+      sendInput({ type: "open_project_space" });
+      setStatus("正在进入项目空间绑定租户…");
+    });
+    document.getElementById("btnCancel").addEventListener("click", async () => {
+      try {
+        await fetch(gatewayOrigin() + "/api/feishu-project-sync/remote-browser/cancel", { method: "POST" });
+      } catch {}
+      setStatus("已取消", "err");
+    });
+    document.getElementById("btnReload").addEventListener("click", async () => {
+      try {
+        const r = await fetch(gatewayOrigin() + "/api/feishu-project-sync/remote-browser/status");
+        const j = await r.json();
+        const d = j.data || {};
+        setStatus(d.message || d.phase || d.status || "无会话", d.status === "success" ? "ok" : "");
+      } catch (e) {
+        setStatus(e.message, "err");
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      if (closedBySuccess) return;
+      notifyDetach();
+    });
+    window.addEventListener("beforeunload", () => {
+      if (closedBySuccess) return;
+      notifyDetach();
+    });
+
+    connect();
+  </script>
+</body>
+</html>

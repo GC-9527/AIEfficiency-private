@@ -1,0 +1,116 @@
+{
+  "name": "aiefficiency-service-control",
+  "version": "1.0.0",
+  "description": "Cross-platform bundled service controller for AIEfficiency",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test scripts/*.test.js external-url.test.cjs",
+    "build-web": "cd ../web-dashboard && npm run build",
+    "prepare-gateway": "node scripts/prepare-gateway.js",
+    "prepare-node-runtime": "node scripts/prepare-node-runtime.js",
+    "prepare-release-resources": "node ../scripts/prepare-release-resources.mjs .tmp/release-resources",
+    "prepare-resources": "npm run build-web && npm run prepare-gateway && npm run prepare-node-runtime && npm run prepare-release-resources",
+    "clean-dist": "node scripts/clean-dist.js",
+    "dist": "npm run prepare-resources && npm run clean-dist && npx electron-builder",
+    "dist:win": "npm run prepare-resources && npm run clean-dist && npx electron-builder --win",
+    "dist:mac": "npm run prepare-resources && npm run clean-dist && npx electron-builder --mac",
+    "dist:linux": "npm run prepare-resources && npm run clean-dist && npx electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.aiefficiency.servicecontrol",
+    "productName": "AIEfficiency Service Control",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "external-url.js",
+      "build-policy.cjs",
+      "gateway-native-runtime.cjs",
+      "runtime-health-policy.cjs",
+      "profile-role-policy.cjs",
+      "instance-identity.cjs",
+      "api-engine-sync-runtime.cjs",
+      "preload.js",
+      "renderer/**/*",
+      "scripts/sync-dev-profile-data.cjs",
+      "scripts/sync-api-engines.cjs"
+    ],
+    "extraResources": [
+      {
+        "from": "../desktop/icons",
+        "to": "icons"
+      },
+      {
+        "from": "gateway-bundled",
+        "to": "gateway",
+        "filter": [
+          "**/*",
+          "!**/config.json",
+          "!**/.secrets/**",
+          "!**/*.db",
+          "!**/*.db-shm",
+          "!**/*.db-wal",
+          "!**/*.db-journal",
+          "!**/*.log"
+        ]
+      },
+      {
+        "from": "../features/FeiShuProjects/src",
+        "to": "features/FeiShuProjects/src",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../web-dashboard/dist",
+        "to": "web-dist"
+      },
+      {
+        "from": ".tmp/release-resources/skills",
+        "to": "skills"
+      },
+      {
+        "from": ".tmp/release-resources/configs",
+        "to": "configs"
+      },
+      {
+        "from": "node-runtime",
+        "to": "node-runtime"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../desktop/icons/icon.ico",
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "../desktop/icons/icon.png",
+      "category": "public.app-category.developer-tools",
+      "identity": null
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "../desktop/icons/icon.png",
+      "category": "Development"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "package": "com.appmarket.automotive",
+  "fixed_test_app_title": "",
+  "timeouts": {
+    "page_ready_s": 30,
+    "home_stable_samples": 3,
+    "install_s": 120,
+    "menu_dwell_s": 2
+  },
+  "thresholds": {
+    "required_duration_s": 180,
+    "required_sample_rows": 36,
+    "expected_logical_cpus": 5,
+    "cpu_customer_single_peak_pct": 3.3,
+    "cpu_multi_core_peak_pct": 16.5,
+    "cpu_customer_mean_pct": 1.25,
+    "pss_peak_mb": 190,
+    "pss_mean_mb": 140,
+    "minimum_valid_sample_ratio": 0.9
+  },
+  "selectors": {
+    "home_ready": [
+      { "resource_id_regex": "(?i)(home|recommend).*(root|list|content)" },
+      { "resource_id_regex": "(?i)(home.*(rec.*rv|recycler)|vp.*content)" },
+      { "resource_id_regex": "(?i)(recommend_empty|empty_recommend)" },
+      { "resource_id_regex": "(?i)(app|recommend).*(recycler|grid)" }
+    ],
+    "catalog_empty": [
+      { "resource_id_regex": "(?i)(recommend_empty|empty_recommend)" },
+      { "text_regex": "^(当前地区暂无应用提供下载|暂无应用|No apps available.*)$" }
+    ],
+    "app_card": [
+      { "resource_id_regex": "(?i)(app.*(card|item|name|icon)|item.*app)" },
+      { "resource_id_regex": "(?i)item.*(hot.*rec|app).*root" }
+    ],
+    "detail_ready": [
+      { "resource_id_regex": "(?i)(detail|app_info).*(root|content|scroll)" },
+      { "text_regex": "^(详情|应用详情|Details|App details)$" }
+    ],
+    "download": [
+      { "resource_id_regex": "(?i)(download|install).*(button|btn|action)?" },
+      { "text_regex": "^(下载|安装|获取|Download|Install|Get)$" }
+    ],
+    "installed": [
+      { "text_regex": "^(打开|已安装|启动|完成|Open|Installed|Launch|Done)$" }
+    ],
+    "installer_action": [
+      { "text_regex": "^(安装|继续安装|允许|确定|完成|知道了|我知道了|Install|Continue|Allow|OK|Done)$" }
+    ],
+    "home_tab": [
+      { "resource_id_regex": "(?i)(tab.*home|home.*tab)" },
+      { "text_regex": "^(首页|Home)$" }
+    ],
+    "my_tab": [
+      { "resource_id_regex": "(?i)(tab.*(mine|my)|mine.*tab|my.*tab)" },
+      { "text_regex": "^(我的|个人中心|My|Me|Profile)$" }
+    ],
+    "my_ready": [
+      { "resource_id_regex": "(?i)(mine|my|profile).*(root|content|list)" },
+      { "text_regex": "^(我的|个人中心|My|Profile)$" }
+    ]
+  },
+  "secondary_menus": [
+    {
+      "id": "updates",
+      "label": "更新管理",
+      "selectors": [
+        { "text_regex": "^(更新管理|应用更新|Updates|App updates)$" }
+      ]
+    },
+    {
+      "id": "installs",
+      "label": "安装管理",
+      "selectors": [
+        { "text_regex": "^(安装管理|下载管理|我的下载|Install manager|Downloads|Download manager)$" }
+      ]
+    },
+    {
+      "id": "feedback",
+      "label": "问题与反馈",
+      "selectors": [
+        { "text_regex": "^(问题与反馈|帮助与反馈|Feedback|Help and feedback)$" }
+      ]
+    },
+    {
+      "id": "about",
+      "label": "关于我们",
+      "selectors": [
+        { "text_regex": "^(关于我们|About us|About)$" }
+      ]
+    },
+    {
+      "id": "user_agreement",
+      "label": "用户协议",
+      "selectors": [
+        { "text_regex": "^(用户协议|User agreement|Terms of use)$" }
+      ]
+    },
+    {
+      "id": "privacy",
+      "label": "隐私政策",
+      "selectors": [
+        { "text_regex": "^(隐私政策|Privacy policy)$" }
+      ]
+    }
+  ]
+}

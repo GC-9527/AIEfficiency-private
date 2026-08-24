@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project Engineering Acceptance Result v4.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "project_task_id",
+    "mode",
+    "change_type",
+    "candidate",
+    "gates",
+    "blocking_findings",
+    "unknowns",
+    "residual_risks",
+    "project_change_decision",
+    "production_readiness"
+  ],
+  "properties": {
+    "project_task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "PROJECT-QUICK",
+        "PROJECT-STANDARD",
+        "PROJECT-RELEASE"
+      ]
+    },
+    "change_type": {
+      "enum": [
+        "FEATURE",
+        "DEFECT_FIX",
+        "REFACTOR",
+        "CONFIG_OR_DATA",
+        "PACKAGE_OR_RELEASE",
+        "TEST_OR_HARNESS",
+        "REVIEW_OR_ANALYSIS",
+        "DOCUMENTATION",
+        "MIXED"
+      ]
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "repository",
+        "base_ref",
+        "head_ref",
+        "diff_hash",
+        "environment_id"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "head_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "diff_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "SKIPPED",
+              "BLOCKED"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "blocking_findings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "project_change_decision": {
+      "enum": [
+        "ACCEPTED",
+        "PARTIAL",
+        "REJECTED",
+        "NOT_ASSESSED"
+      ]
+    },
+    "production_readiness": {
+      "enum": [
+        "READY",
+        "NOT_READY",
+        "NOT_ASSESSED"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "PROJECT-QUICK"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "project_change_decision": {
+            "const": "NOT_ASSESSED"
+          },
+          "production_readiness": {
+            "const": "NOT_ASSESSED"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "project_change_decision": {
+            "const": "ACCEPTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocking_findings": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "production_readiness": {
+            "const": "READY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mode": {
+            "const": "PROJECT-RELEASE"
+          },
+          "project_change_decision": {
+            "const": "ACCEPTED"
+          },
+          "blocking_findings": {
+            "maxItems": 0
+          },
+          "unknowns": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

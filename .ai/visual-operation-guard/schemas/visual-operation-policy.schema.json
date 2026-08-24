@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiefficiency.local/schemas/visual-operation-policy.schema.json",
+  "title": "AIEfficiency Visual Operation Policy",
+  "type": "object",
+  "required": [
+    "version",
+    "policyId",
+    "defaultMode",
+    "channelOrder",
+    "preflight",
+    "visual",
+    "humanHandoff",
+    "unattended",
+    "authorization",
+    "audit",
+    "modes"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policyId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "defaultMode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "channelOrder": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "preflight": {
+      "type": "object",
+      "required": [
+        "requiredBeforeVisual",
+        "requiredCategories",
+        "allowedStatuses",
+        "reasonRequired",
+        "rejectVisualWhenHigherPriorityAvailable"
+      ],
+      "properties": {
+        "requiredBeforeVisual": {
+          "type": "boolean"
+        },
+        "requiredFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiredCategories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "channels"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "channels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "allowedStatuses": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "available",
+              "unavailable",
+              "not_applicable"
+            ]
+          }
+        },
+        "reasonRequired": {
+          "type": "boolean"
+        },
+        "availableStrategyRequired": {
+          "type": "boolean"
+        },
+        "rejectVisualWhenHigherPriorityAvailable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "visual": {
+      "$ref": "#/$defs/visual"
+    },
+    "humanHandoff": {
+      "type": "object"
+    },
+    "testing": {
+      "type": "object"
+    },
+    "unattended": {
+      "type": "object"
+    },
+    "audit": {
+      "type": "object"
+    },
+    "modes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "visual": {
+            "$ref": "#/$defs/visualPartial"
+          },
+          "runtime": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "required": [
+        "ttlSeconds",
+        "executionResultTtlSeconds",
+        "maxPendingPerTask",
+        "maxActivePerTask",
+        "singleUse",
+        "resultReplayTtlSeconds",
+        "maxCompletedPerTask"
+      ],
+      "properties": {
+        "ttlSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maxPendingPerTask": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "singleUse": {
+          "const": true
+        },
+        "executionResultTtlSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "maxActivePerTask": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "resultReplayTtlSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxCompletedPerTask": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "visual": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "maxDiscoveryScreenshots",
+        "maxVerificationScreenshots",
+        "maxVisualActions",
+        "maxRetriesPerTarget",
+        "maxNoProgressEvents",
+        "maxVisualCostUnits",
+        "costUnits"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "maxDiscoveryScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxVerificationScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxOtherScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxVisualActions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxCoordinateActions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxRetriesPerTarget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxSameScreenRepeats": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxNoProgressEvents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "handoffWhenEstimatedScreenTransitionsGt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "handoffWhenEstimatedVisualActionsGt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requireRegionScopedAfterDiscovery": {
+          "type": "boolean"
+        },
+        "denyFullScreenAfterDiscovery": {
+          "type": "boolean"
+        },
+        "maxVisualCostUnits": {
+          "type": "number",
+          "minimum": 0
+        },
+        "costUnits": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "visualPartial": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "maxDiscoveryScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxVerificationScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxOtherScreenshots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxVisualActions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxCoordinateActions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxRetriesPerTarget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxSameScreenRepeats": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxNoProgressEvents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxVisualCostUnits": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

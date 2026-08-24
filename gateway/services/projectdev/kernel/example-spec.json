@@ -1,0 +1,48 @@
+{
+  "specId": "demo-todo-api",
+  "vision": "用 Node.js + Express 从零做一个带持久化与测试的 Todo REST API：含 增/删/改/查、输入校验、SQLite 持久化、Jest 单元测试与集成测试，可一键构建与测试通过。代码整洁、有 README。",
+  "projectDir": "D:/work/demo-todo-api",
+  "engine": "claude",
+  "sessionCostCapUsd": 50,
+  "gating": "none",
+  "allowedWrites": [],
+  "cooldownSeconds": 3,
+  "milestones": [
+    {
+      "id": "M1",
+      "title": "项目脚手架 + 可运行 Express 服务",
+      "prompt": "在当前目录初始化一个 Node.js 项目：package.json（含 express、better-sqlite3、jest、supertest 依赖与 build/test 脚本）、src/app.js（导出 Express app）、src/server.js（启动），先实现 GET /health 返回 {status:'ok'}。",
+      "kind": "claude",
+      "maxTurns": 40,
+      "maxCostUsd": 15,
+      "acceptance": [
+        { "type": "file_exists", "path": "package.json" },
+        { "type": "cmd", "cmd": "npm install", "timeoutSec": 900 },
+        { "type": "cmd", "cmd": "node -e \"const app=require('./src/app');if(!app)process.exit(1)\"", "timeoutSec": 60 }
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Todo CRUD + SQLite 持久化 + 校验",
+      "prompt": "实现 /todos 的 CRUD（POST 创建、GET 列表、GET/:id、PUT/:id、DELETE/:id），用 better-sqlite3 持久化，标题必填校验，错误返回合适状态码。",
+      "kind": "claude",
+      "maxTurns": 60,
+      "maxCostUsd": 20,
+      "acceptance": [
+        { "type": "grep_count", "pattern": "app\\.(get|post|put|delete)\\(", "path": "src", "min": 5 }
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "测试覆盖 + 全绿",
+      "prompt": "为 health 与 todos CRUD 写 Jest + supertest 的单元/集成测试，覆盖正常与异常路径，确保 npm test 全部通过。",
+      "kind": "claude",
+      "maxTurns": 60,
+      "maxCostUsd": 15,
+      "acceptance": [
+        { "type": "grep_count", "pattern": "(test|it)\\(", "path": "tests", "min": 6 },
+        { "type": "cmd", "cmd": "npm test", "timeoutSec": 600 }
+      ]
+    }
+  ]
+}

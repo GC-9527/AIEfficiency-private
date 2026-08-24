@@ -1,0 +1,120 @@
+{
+  "$schema": "../config/project/.ai/visual-operation-guard/schemas/operation-map.schema.json",
+  "version": "1.0.0",
+  "projectId": "aiefficiency-web-example",
+  "defaults": {
+    "strategyTimeoutMs": 15000,
+    "maxRetries": 1,
+    "requireVerification": true,
+    "secretsFromEnvironmentOnly": true
+  },
+  "operations": {
+    "open_ai_workbench_model_settings": {
+      "objective": "直接打开 AI 工作台模型设置页面",
+      "coreInteractionUnderTest": null,
+      "successCriteria": [
+        "URL 为模型设置路由",
+        "页面标题和模型列表可见"
+      ],
+      "strategies": [
+        {
+          "id": "model-settings-route",
+          "channel": "route",
+          "priority": 10,
+          "enabled": true,
+          "platforms": [
+            "web"
+          ],
+          "url": "${AIEFFICIENCY_BASE_URL}/aiautowork/settings/models",
+          "verify": {
+            "type": "dom",
+            "selector": "[data-testid='model-settings-page']"
+          },
+          "fallbackTo": "model-settings-playwright",
+          "lastVerifiedAt": null,
+          "owner": "frontend"
+        },
+        {
+          "id": "model-settings-playwright",
+          "channel": "playwright",
+          "priority": 20,
+          "enabled": true,
+          "platforms": [
+            "web"
+          ],
+          "selector": {
+            "role": "link",
+            "name": "模型设置",
+            "testId": "nav-model-settings"
+          },
+          "verify": {
+            "type": "dom",
+            "selector": "[data-testid='model-settings-page']"
+          },
+          "fallbackTo": "model-settings-visual",
+          "lastVerifiedAt": null,
+          "owner": "frontend"
+        },
+        {
+          "id": "model-settings-visual",
+          "channel": "visual",
+          "priority": 90,
+          "enabled": true,
+          "platforms": [
+            "web"
+          ],
+          "preconditions": [
+            "路由和 DOM 选择器均不可用",
+            "已取得 Guard 授权"
+          ],
+          "verify": {
+            "type": "region_screenshot",
+            "region": "browser-content"
+          },
+          "lastVerifiedAt": null,
+          "owner": "qa"
+        }
+      ]
+    },
+    "configure_ticket_sync_rule": {
+      "objective": "配置一个工单同步映射规则",
+      "coreInteractionUnderTest": "用户在 UI 中选择来源字段并保存规则",
+      "successCriteria": [
+        "保存接口返回成功",
+        "规则列表展示新规则",
+        "刷新后仍存在"
+      ],
+      "strategies": [
+        {
+          "id": "ticket-rule-playwright",
+          "channel": "playwright",
+          "priority": 10,
+          "enabled": true,
+          "platforms": [
+            "web"
+          ],
+          "selector": {
+            "testId": "ticket-sync-rule-editor"
+          },
+          "verify": {
+            "type": "combined",
+            "checks": [
+              {
+                "type": "network",
+                "method": "POST",
+                "path": "/api/ticket-sync/rules",
+                "status": 200
+              },
+              {
+                "type": "dom",
+                "selector": "[data-testid='ticket-sync-rule-saved']"
+              }
+            ]
+          },
+          "lastVerifiedAt": null,
+          "owner": "ticket-sync"
+        }
+      ]
+    }
+  }
+}

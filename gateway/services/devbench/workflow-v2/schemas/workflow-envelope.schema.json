@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/workflow-envelope-v2.json",
+  "title": "Workflow Envelope v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "storyId",
+    "recordId",
+    "contextId",
+    "revision",
+    "idempotencyKey",
+    "payloadSchemaId",
+    "payloadSha256",
+    "operationArgsSha256",
+    "previousEnvelopeSha256",
+    "createdAt",
+    "payload",
+    "envelopeSha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "workflow-envelope-v2"
+    },
+    "storyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "recordId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "contextId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 999999999999
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160
+    },
+    "payloadSchemaId": {
+      "enum": [
+        "https://example.local/schemas/stage-context-v2.json",
+        "https://example.local/schemas/workflow-checkpoint-v2.json",
+        "https://example.local/schemas/evidence-manifest-v2.json",
+        "https://example.local/schemas/evidence-receipt-v2.json",
+        "https://example.local/schemas/stage-result-record-v1.json"
+      ]
+    },
+    "payloadSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operationArgsSha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "previousEnvelopeSha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "envelopeSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "payloadSchemaId": {
+            "const": "https://example.local/schemas/evidence-receipt-v2.json"
+          }
+        },
+        "required": [
+          "payloadSchemaId"
+        ]
+      },
+      "then": {
+        "properties": {
+          "operationArgsSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "operationArgsSha256": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

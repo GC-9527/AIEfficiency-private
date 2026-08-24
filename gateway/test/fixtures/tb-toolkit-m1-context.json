@@ -1,0 +1,103 @@
+{
+  "resolved": {
+    "tbTaskId": "0123456789abcdef01234567",
+    "carbId": "CARB-15125",
+    "title": "M1 脱敏工单",
+    "ticketUrl": "https://www.teambition.com/task/0123456789abcdef01234567"
+  },
+  "detail": {
+    "_id": "0123456789abcdef01234567",
+    "uniqueId": 15125,
+    "content": "M1 脱敏工单",
+    "note": "DETAIL_SENTINEL_M1",
+    "project": {
+      "_id": "project-fixture-m1",
+      "name": "脱敏项目"
+    },
+    "tasklist": {
+      "_id": "tasklist-fixture-m1",
+      "title": "脱敏任务列表"
+    },
+    "sprint": {
+      "_id": "sprint-fixture-m1",
+      "name": "脱敏迭代",
+      "dueDate": "2026-08-31T00:00:00.000Z",
+      "status": "active"
+    },
+    "taskflowstatus": {
+      "name": "AI甄别"
+    },
+    "priority": "P0",
+    "creatorId": "creator-fixture-m1",
+    "executorId": "executor-fixture-m1",
+    "created": "2026-08-20T01:02:03.000Z",
+    "updated": "2026-08-21T04:05:06.000Z",
+    "dueDate": "2026-08-31T00:00:00.000Z",
+    "customfields": [
+      {
+        "name": "缺陷分类",
+        "value": "CUSTOM_FIELD_SENTINEL_M1"
+      }
+    ]
+  },
+  "tbContext": {
+    "title": "M1 脱敏工单",
+    "description": "DETAIL_SENTINEL_M1",
+    "projectId": "project-fixture-m1",
+    "projectName": "脱敏项目",
+    "tasklistId": "tasklist-fixture-m1",
+    "tasklistName": "脱敏任务列表",
+    "sprintId": "sprint-fixture-m1",
+    "sprintName": "脱敏迭代",
+    "tags": [
+      "fixture"
+    ],
+    "statusName": "STATUS_SENTINEL_M1",
+    "priority": "PRIORITY_SENTINEL_M1",
+    "creatorId": "creator-fixture-m1",
+    "executorId": "executor-fixture-m1",
+    "participants": [
+      "PARTICIPANT_SENTINEL_M1"
+    ],
+    "createdAt": "CREATED_AT_SENTINEL_M1",
+    "updatedAt": "UPDATED_AT_SENTINEL_M1",
+    "customFields": [
+      {
+        "name": "缺陷分类",
+        "value": "CUSTOM_FIELD_SENTINEL_M1"
+      }
+    ],
+    "comments": [
+      {
+        "time": "2026-08-21 04:05",
+        "who": "评论人",
+        "text": "COMMENT_SENTINEL_M1"
+      }
+    ],
+    "attachments": [
+      {
+        "id": "attachment-fixture-m1",
+        "name": "ATTACHMENT_SENTINEL_M1.log",
+        "size": 128,
+        "hasUrl": true,
+        "source": "comment"
+      }
+    ],
+    "sourceCoverage": {
+      "comments": {
+        "available": true,
+        "complete": true,
+        "source": "fixture",
+        "count": 1,
+        "textCount": 1
+      },
+      "attachments": {
+        "available": true,
+        "complete": true,
+        "source": "fixture",
+        "count": 1
+      }
+    }
+  }
+}
+

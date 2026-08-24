@@ -1,0 +1,30 @@
+:root {
+  --ui-z-base: 0;
+  --ui-z-raised: 10;
+  --ui-z-sticky: 20;
+  --ui-z-dock: 40;
+  --ui-z-dropdown: 60;
+  --ui-z-popover: 70;
+  --ui-z-modal-backdrop: 80;
+  --ui-z-modal: 90;
+  --ui-z-toast: 110;
+  --ui-z-emergency: 120;
+
+  /* Shared fixed layers should reserve or publish their safe area. */
+  --ui-safe-right: 0px;
+  --ui-safe-bottom: 0px;
+}
+
+[data-ui-layer="sticky"] { z-index: var(--ui-z-sticky); }
+[data-ui-layer="dock"] { z-index: var(--ui-z-dock); }
+[data-ui-layer="dropdown"] { z-index: var(--ui-z-dropdown); }
+[data-ui-layer="popover"] { z-index: var(--ui-z-popover); }
+[data-ui-layer="modal-backdrop"] { z-index: var(--ui-z-modal-backdrop); }
+[data-ui-layer="modal"] { z-index: var(--ui-z-modal); }
+[data-ui-layer="toast"] { z-index: var(--ui-z-toast); }
+
+[data-ui-region="main-content"] {
+  min-width: 0;
+  padding-right: var(--ui-safe-right);
+  padding-bottom: var(--ui-safe-bottom);
+}

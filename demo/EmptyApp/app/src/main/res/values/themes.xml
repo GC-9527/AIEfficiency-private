@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      windowBackground = 红：启动窗口(starting window / 预览窗口)即为红色，
+      点击图标后系统几乎立刻显示，远早于 App 首帧 —— 最贴近"点击->看到页面"的系统底座耗时。
+    -->
+    <style name="RedTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/red</item>
+        <item name="android:statusBarColor">@color/red</item>
+        <item name="android:navigationBarColor">@color/red</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDisablePreview">false</item>
+    </style>
+</resources>

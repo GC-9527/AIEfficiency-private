@@ -1,0 +1,23 @@
+{
+  "name": "@aiefficiency/tb-ticket-toolkit",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "tbfix": "apps/tbfix-cli/src/index.js",
+    "tb-ticket-mcp": "mcp/tb-ticket-mcp/src/index.js"
+  },
+  "scripts": {
+    "test": "node --test --test-timeout=60000",
+    "check": "node --check packages/tb-domain/src/index.js && node --check packages/tb-official-mcp/src/index.js && node --check packages/tb-provider-teambition/src/index.js && node --check packages/tb-application/src/git-isolation.js && node --check packages/tb-application/src/prepare-ticket.js && node --check packages/tb-application/src/update-service.js && node --check packages/tb-application/src/bootstrap.js && node --check mcp/tb-ticket-mcp/src/server.js && node --check mcp/tb-ticket-mcp/src/index.js && node --check apps/tbfix-cli/src/cli.js && node --check adapters/aiefficiency/src/index.js",
+    "mcp": "node mcp/tb-ticket-mcp/src/index.js",
+    "tbfix": "node apps/tbfix-cli/src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@tng/teambition-openapi-mcp": "0.2.2"
+  }
+}

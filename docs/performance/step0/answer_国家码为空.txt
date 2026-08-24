@@ -1,0 +1,61 @@
+ 完整结论出来了 —— 核心需求已满足，且不用改代码、不走 mock，全靠写设备属性。
+
+  排查结果
+
+  1. carmachine —— 本来就对，是 avatr-8678 ✅
+  - avatr 车机的车型码（com.avatr.system.SystemConfig.CONFIG_VEHICLE_MODLE，来自车机 jar）= E15-EU-Left，已正确映射成 avatr-8678。
+  - C518 只是 ROM 的 ro.product.model，不是 avatr 的车型码。所以不用把 C518 加映射——carmachine 一直是对的。
+  - 这条链路走的是 Avatr8678PlatformBridge/Avatr8678Sdk（真机 sysprop + 反射），不经 AppMockData。
+
+  2. 国家码为什么空 —— 根因：ro.avatr.car.locale.string 台架没写
+  - 该属性由车机 boot 阶段写，台架机为空 → 国家码取不到。
+
+  3. 已修复（写入车机设备，非 mock） ✅
+  - 设备是 root，我 setprop ro.avatr.car.locale.string SA。现在 SDK 日志：rawRegion='SA' → getVehicleCountryCode → 'SA'。
+  - 机制：SDK 先查 modelRegionMap（model→region 映射表），但该表是空的（known models=[]，配置没拉到）→ 回退到 raw sysprop = SA。所以国家码 = SA。
+
+  4. 你看到的 region='US' 是什么 —— 只是 RegionResolver 内部 bootstrap 去拉那张 model-region 映射表时用的默认值，不是 App 的主国家码。App 主国家码已是 SA。
+
+  ⚠️ 两个注意
+
+  1. setprop ro.* 重启后会丢。车机重启后重跑一次：
+  adb -s 192.168.20.116:5566 shell setprop ro.avatr.car.locale.string SA
+  1. 要永久：让车机 boot 写该属性，或我做个开机自动 setprop 脚本。
+  2. modelRegionMap 是空的（拉不到 model→region 配置）——目前靠 raw sysprop 兜底成 SA，够用；但若以后想按"车型→区域"精确映射（如 E15-EU-Left→SA 由配置决定），得让后端那张配置表能拉到（这是后端/网络配置，不在 App 端）。
+
+  ---
+  要不要我：A. 写个开机自动 setprop ro.avatr.car.locale.string SA 的脚本（解决重启丢失）；B. 在 Avatr8678PlatformBridge/SDK 里把 E15-EU-Left → SA 直接固化进 modelRegionMap（这样不依赖 sysprop，也不依赖后端配置，代码级保证
+  SA）？B 更彻底但要改码+重打包。你定。
+
+
+
+===========================================
+
+ 总结
+
+  诊断
+  - 国家码空：ro.avatr.car.locale.string 台架未写（车机 boot 才写）。
+  - carmachine 本来就对：车型码 E15-EU-Left（来自车机 jar）→ 已映射 avatr-8678；C518 只是 ROM 的 ro.product.model，非 avatr 车型码。
+
+  A — 脚本（commit ded44e0） tools/perf-loop/set-car-region.ps1
+  - root 写 debug.appmarket.region（bridge 最高优先读），不走 mock。
+  - -CountryCode 可改（默认 SA）、-Clear 清除、-RestartApp 重启应用重读。
+  - debug.* 可随时 setprop 即时生效、免重启/免重打包。
+
+  B — 代码（commit bf81f7eb7，已打 release 装到 C518） Avatr8678PlatformBridge.region()
+  - 优先级：运行时覆盖 debug.appmarket.region → SDK → ro.avatr.car.locale.string → 代码级默认 MODEL_REGION_DEFAULT(E15-EU-Left→SA) → Locale。
+  - 改默认国家码就改 MODEL_REGION_DEFAULT（重启也在）。
+
+  验证：debug.appmarket.region='SA' + SDK getVehicleCountryCode='SA' + 请求头 region=bridge.region()→SA。carmachine=avatr-8678。
+
+  改成其他国家码（你要的"可配置"）
+
+  - 即时改（推荐，免重启/重打包）：
+  powershell -ExecutionPolicy Bypass -File tools\perf-loop\set-car-region.ps1 -Serial 192.168.20.116:5566 -CountryCode US -RestartApp
+  - 改 baked 默认：编辑 Avatr8678PlatformBridge 的 MODEL_REGION_DEFAULT（"E15-EU-Left" to "US"）→ 重打 release。
+
+  两个细节：① ro.avatr.car.locale.string=SA 是我本 boot setprop 的，重启丢失但 B 的默认/覆盖兜底；② release 的 App 日志走加密 ELOG 不进 logcat，所以 bridge 的 region 日志在 logcat 看不到（属正常，逻辑已验证）。
+
+  要不要我把 set-car-region.ps1 也写进 tools/perf-loop/README（用法 + 改国家码示例）？
+
+你统计的数据是要区分应用市场版本号版本信息，后面优化掉后是要按照版本号版本信息来区分的来区分与跟进优化效果

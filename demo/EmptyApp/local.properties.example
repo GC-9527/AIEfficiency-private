@@ -1,0 +1,10 @@
+# 复制本文件为 local.properties 并填入真实值（local.properties 已 gitignore，不入库）。
+
+# Android SDK 路径
+sdk.dir=C\:\\path\\to\\Android\\sdk
+
+# avatr8678 平台签名（mtk8678.keystore 自行放到工程根目录，也已 gitignore）
+mtk8678.storeFile=mtk8678.keystore
+mtk8678.storePassword=<store-password>
+mtk8678.keyAlias=<key-alias>
+mtk8678.keyPassword=<key-password>

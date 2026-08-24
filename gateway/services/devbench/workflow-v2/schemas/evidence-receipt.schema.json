@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/evidence-receipt-v2.json",
+  "title": "Evidence Receipt v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "receiptId",
+    "action",
+    "status",
+    "startedAt",
+    "finishedAt",
+    "toolName",
+    "operationId",
+    "idempotencyKey"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "evidence-receipt-v2"
+    },
+    "receiptId": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "evidenceId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "operationId": {
+      "type": "string",
+      "maxLength": 160,
+      "minLength": 1
+    },
+    "action": {
+      "enum": [
+        "READ",
+        "SEARCH",
+        "EXTRACT",
+        "INSPECT",
+        "EDIT",
+        "BUILD",
+        "TEST",
+        "INSTALL",
+        "DEVICE_ACTION",
+        "DB_QUERY",
+        "CAPTURE",
+        "RENDER",
+        "UPLOAD",
+        "TB_WRITE",
+        "GIT_OPERATION"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "PARTIAL"
+      ]
+    },
+    "toolName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "rootId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 32
+    },
+    "selector": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "exitCode": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "outputRef": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 600
+    },
+    "sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "idempotencyKey": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 160,
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "enum": [
+              "EDIT",
+              "BUILD",
+              "TEST",
+              "INSTALL",
+              "DEVICE_ACTION",
+              "DB_QUERY",
+              "CAPTURE",
+              "RENDER",
+              "UPLOAD",
+              "TB_WRITE",
+              "GIT_OPERATION"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

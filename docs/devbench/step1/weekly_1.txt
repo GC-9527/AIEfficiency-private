@@ -1,0 +1,50 @@
+时间范围 2026-06-08 ～ 2026-06-14。我已严格依据提供的 Git 提交记录与对话记录梳理，去重了同一仓库在不同目录下的重复提交，未补充任何记录中不存在的内容。
+
+本周工作纪要（2026.06.08 – 06.14）
+
+一、AI 工程开发工作台 devbench（核心，自研提效工具）
+- 工作台从零搭建：新增「工程开发 /devbench」模块，复用现有 cardev 的页面模块化与 WebSocket 流式机制（前端连 /ws、subscribe_session 按 sessionId 过滤推送 chat_stream，deltaType 分 thinking/text/tool_use），实现按故事点多工程并行 + 直接驱动 Claude CLI 对话，每个 tab 用独立 sessionId 复用基础设施。
+- 故事点配置体系：主工程/关联工程/设备/分支/关联工单（URL）/关联任务（CARB 编号）全部纳入故事点配置并存档，配置项变化（切主工程、切分支、换设备、改工单）均写入存档事件供复盘；新建故事点可从已关闭/当前故事点复制配置但不带入会话历史（closed-tabs.json 存配置快照，上限 50 条去重）。
+- 上下文不丢与防卡死：定位上下文丢失根因为并发发送导致 --resume 续接竞态（cliSessionId 在 runTask 完成后才落库），增加运行中发送按钮禁用 + doSend 早退兜底；落地「防卡死三件套」——停止按钮 + result 兜底超时 + 单轮执行模式约束；关联工程经 --add-dir 纳入 Claude 工作区，对齐 Android Studio terminal 里 Claude 读取工程 mcp/skill 配置的效果。
+- 交互增强：CLI 式灰字幽灵补全（右方向键填充下一步建议）、粘贴图片、拖拽文件/文件夹材料（统一收敛到 materials 目录、去重限最近 50 条并在每轮 prompt 提醒）、会话标题悬浮跳转面板、复制诊断参数、Claude 运行/空闲状态指示、发送旁「清空」按钮（确认弹窗）、修复分段回答不换行、加固存档文件名生成防乱码/控制字符。
+- 任务列表与 TB 工单打通：任务列表悬浮面板（参考 todoist 交互，完成置灰、收起展开），批量新增智能解析 rule_1 清单格式（识别 P0/P1 优先级分组头、去序号、抽取行尾期限）；接入 Teambition，按执行者=当前用户同步「待处理/开发中/进行中」工单，TB 候选区按迭代（sprint section）分组并按剩余/逾期天数排序；同步失败改为引导弹窗（区分未配置/未扫码登录，内置扫码登录并自动重试）；TB 单「添加到任务」、任务完成前校验 TB 工单状态。
+- 「执行开发」闭环：任务列表每条待办新增「执行开发」，自动以任务名（TB 单则前缀 #TB单号#）新建故事点并关联工单/任务，提交时 commit 消息按「#TB单号# #版本名# 任务名 #flavor#」格式生成。
+- Android 工程感知：按 flavorConfig.json 解析 flavor 下拉（无配置则交用户手填，不再递归扫 build.gradle）；选定 flavor 后自动显示版本名/版本号并注入 Claude 上下文；版本号悬浮窗一键 +10 进位（如 1.2.90→1.3.0、versionCode 10300），并写回 project_flavor.gradle（无则写 build.gradle）；主工程下拉显示当前 Git 分支并做标签化美化与截断修复。
+- 工具命令悬浮面板：Local Changes（Git）面板对标 Android Studio——按目录树展开/收起、未跟踪文件分组、group by directory 与列出全部文件切换、修复中文文件名八进制转义乱码（git -c core.quotepath=false）；设备模拟面板（wm density / wm size 预设，新增/删除/重置，修复 size 宽高写反应为 1440x2560，加设备重启按钮使 dpi 生效）。
+- 资源/产物管理：资源管理面板（类 IDE 目录树、复制绝对路径、系统资源管理器打开）；APK 产物按钮支持自定义来源（主/关联工程各设「设为 APK 产物」，状态持久化），路径不存在 toast 提示。
+- 桌面版（Electron）：桌面 100% 复用 web 前端+网关，定位「缺功能」实为旧 bundle（dist 停留在 5/30），重建 bundle 并打 NSIS 安装包；修复启动崩溃 Cannot find module './cardev-ipc.js'（app.asar 漏打补回）；下载官方 Node v22.20.0 portable 放入 node-runtime 打出免装 Node 安装包；修复「一直发现新版本」误报（改用 semver 比较）；版本迭代至 1.5.7。
+- 并行开发隔离：开发工程与生产工程分目录，端口隔离为网关 3002 / 网页 3010（vite.config.js、start.ps1/.bat、stop.ps1 同步改造，端口改动不 push 以免影响其他工程）；修复缺包 remark-breaks（start 脚本改为每次 npm install --no-audit --no-fund）；周报/总结按钮（周/月/季/年报告，依据对话+Git 生成 txt 与 docx 存档）。
+
+二、埋点 SDK 端到端集成与验收（AppMarket202511 / TrackFeature）
+- SDK 接入：在目标 app 接入埋点 SDK 的 api/core/storage/uploader 5 模块源码，去掉 Room/KSP/catalog/convention 依赖；Kotlin 由 1.7.10 升至 1.9.24（仅补 webapp-core 一行 jvmTarget），以 assembleGeelye22StgDebug 建立绿编基线。
+- 事件注入：按 events.json 字段规格在业务触发点显式注入 A10xx 系列事件——隐私同意 A1003001/A1003002、检查更新 A1002002、详情 A1001013、打开成败 A1001009/010、卸载 A1002001、轮播曝光/点击 A1001001/002、页面曝光 A1003003、下载链路 A1001003/004/005/006、搜索 A1001012 等；处理 flavor 源集陷阱（geelye22 特定类需在对应变体注入）。
+- 闭环验证：全链路 app→logcat(APP_MKT_TRACK)→uploadLog success(httpCode=200)→MySQL 落库确认（device_key/channel=geely/car_model/country_iso=CN/version_name 等字段比对 PASS）；用 app-mock 模拟无网络/失败/超时/切换应用等边界与重置下载态，将剩余事件跑绿。
+
+三、埋点上报线上 Bug 修复（Geely E22H）
+- countryIso 取空根因修复：测试反馈卸载重装后埋点不再上报，定位 100% 卡点为公共必填参数 countryIso 取到空串导致后端收不到；采纳「应用列表能拉到说明国家码已就绪、所有接口请求都带国家码」的思路，改为复用接口请求里更新有值的国家码（选定国家后刷一次 countryIso），而非持续轮询等 config。
+- 上报 URL 纠偏：修正 prod 埋点上报域名（project_flavor.gradle 与 MainApplication.kt），版本号 +1 打 geelye22 prod release，在真机抓日志确认 URL 正确且上报成功；完成 geelye22 flavor 埋点接入与真机验收，版本推进至 1.4.20。
+- 同步处理 SWIM-1422662：行驶中点击商城首页 BBC world service 应用未直接提示行车无法使用的缺陷。
+
+四、License 管控 SDK 化移植（多车型）
+- geelyp155（CARB-10473）：将 License 管控 SDK 方案（LicenseApi/LicenseGate）移植到 geelyp155，修复 release 打包 R8 重复类失败，版本 1.1.30；只改 geelyp155 flavor、约束改动范围。
+- 参考 2026AISdkV4/AppMarket202601 在 Seres、geelyp155 等工程重写 license：引入 sdk-api/impl aar、补 LicenseTestReceiver 方法级验收钩子、rule_1 五场景真机验收脚本 + scrcpy 逐用例录屏；纠正 README，f515r 版本 1.4.1/1.4.40。
+- 验收诚实更正：Seres 上经真机实跑 run_rule1.sh 发现「停服/仅弹窗」场景前台弹窗缺失（PASS 2/FAIL 3），更正先前「已完成」的结论，定位为决策算对但 currentActivity 为 null 导致 STOP_SERVICE/NOTICE 弹窗未触发，用 app-mock 抓全量日志验证 ctx 链路。
+- AppMarket202601：修复 geelyl946-license 场景 3 冷启动弹窗落到过渡 Activity 被抑制看不到的问题，隐藏 license 弹窗关闭图标并加固 rule_1 断言。
+
+五、冷启动 / 首页性能优化（zeekr9x / avatr）
+- zeekr9x 移植 V5 冷启动优化：Banner override / offscreen / reportFullyDrawn / 延后非关键工作 / 缓存优先；补齐 A1 Splash 直达 Home 发送端 + Baseline Profile 规则文件；config 异步——去 jumpTargetPage 同步等配置，隐私政策更新改响应式弹窗；版本 1.2.0。
+- 首页秒开方案探索：针对客户「进首页所有图片含 banner 全部显示完成」的验收口径，分析 logcat 时序（点击→模板 loading≈1s，瓶颈在 loading 后的 banner 图片解码到 57.290 仍 Missing bitmap），推进「首次请求接口数据+图片打包成可编辑配置/镜像放 assets、断网先显上次页面、网络回来后全量刷新」的整页缓存方案，并在 app-mock 加「是否冷启动显示预置数据」开关做对比验证；dev/prod seed 各进各包、SeedStore 与 build.gradle packaging 配置修正。
+- HomeSnapshot 首屏快照丢失修复：定位「写了 captured 下次却读不到」根因为写盘只 outputStream().use{} 未 fsync、跑在 MIN_PRIORITY 守护线程，关机断电丢页；改为临时文件→os.fd.sync() fsync→原子 rename，release 包保留日志便于后续分析，打 avatr8678 dev release 提测。
+
+六、新机型适配 avatr8155 国家码
+- 复用 avatr8678 同源实现生成 avatr-avatr8155-impl aar：关键差异为国家码 sysprop（avatr8155 用 persist.app.config.country 默认 CN，avatr8678 用 ro.avatr.car.locale.string），按「完整兄弟模块」方案隔离避免 ServiceLoader 冲突；在 avatr8155 依赖中排除 8678 的 sdk-impl.aar、放入新 aar，host 端用 BuildConfig.CHANNEL 区分国家码逻辑，接入 2026AppMarketAIV4。
+
+七、WebApp 媒体播放与方控键
+- 媒体控制：mediacontrol 新增 observePlayStatus + webapp 后台播放排查报告 + pause-fix，网页应用后台保活 mock + 媒体播放探针；排查 apple music 网页「播放按钮停止/误判在播」问题，用 currentTime 探针校正。
+- 媒体键路由排查（Seres202511）：定位 WebAppActivity.dispatchKeyEvent 的媒体键转发判定（CARB-10957 为后台音乐方控引入），确认应用市场探索/直播视频页走 WebAppActivity 的 H5、推荐页为原生 RecyclerView，分析 shouldDispatchToH5KeyEventCodeSet 与 isWebViewHasAudioFocus 焦点信号。
+
+
+八、工程治理
+- Claude 临时产物（截图/视频/txt）统一收纳到各目录 tempFiles/ 并 gitignore；更新各工程 .gitignore 忽略 build/node_modules；修复 skills 被误改（pull-from-cloud 抹掉 frontmatter）问题；TrackFeature 埋点特性 catalog/config/脚本/工具/报告 入库。
+
+本周方法论体会：多次踩到本机工具返回不一致（Edit 报错但实际写入成功）、并发实例编辑互相覆盖、非交互会话误用后台任务等坑，固化了「改前先读盘、关键结论以真机/真实命令实跑为准、不轻信记忆快照」的工作纪律。

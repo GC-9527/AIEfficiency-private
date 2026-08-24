@@ -1,0 +1,104 @@
+首屏镜像（Seed）方案：内置首页数据+图片，断网秒显，联网全量刷新
+
+ Context（为什么做）
+
+ 验收标准是「进入首页后所有图片（含 banner 图）显示完成」。当前即便有 MMKVData.homeBeanPair 数据缓存，首屏图片仍要等接口返回后才下载解码（日志实测点击→banner 解码完 ≈2.7s），且全新安装首启无任何缓存。
+
+ 目标：把「首次联网进首页拿到的所有接口数据 + 所有显示的图片」做成一份出厂内置镜像（seed），放进渠道专属 assets。冷启动直接用 seed 离线渲染首页（数据+图片都不等网络），随后真实网络返回再全量刷新覆盖。镜像为明文
+ JSON，可人为编辑。
+
+ 渠道：avatr8155 + avatr8678（共用 src/avatr8678 源码集）。触发导出：扩展 app-mock 加按钮。
+
+ ---
+ 架构总览
+
+ 镜像格式（zip 解压后放 sample/app-market/src/avatr8678/assets/home_seed/）：
+ home_seed/
+   home_data.json     # Gson(HomeBean)，明文可编辑
+   image_map.json     # { "原始图片URL": "本地文件名" }
+   images/<md5>.bin   # 下载的图片文件
+
+ 三个部分：
+ - 导出器 SeedExporter（debug 工具，真机抓取用）
+ - 加载器 SeedStore（正式功能，所有构建生效，离线渲染）
+ - 全量刷新切换（联网成功后 seed 退场，图片改走网络）
+
+ ---
+ A. 导出器 SeedExporter（真机抓 seed 用，BuildConfig.DEBUG 守护）
+
+ 新建 sample/app-market/src/main/java/com/appmarket/automotive/seed/SeedExporter.kt（object 单例）：
+ 1. updateLatest(home: HomeBean) — 记录最近一次网络成功的 HomeBean（内存）。
+ 2. 启动时 bindService() + observeAppMockData().collect{}，检测 exportSeedTrigger 变化 → 用持有的 lastHomeBean 执行一次导出（无数据则 Toast 提示先进首页）。仿照
+ PerfTracker.observeMockSwitch()（perf-tracker-api/.../PerfTracker.kt:187）。
+ 3. 导出流程：
+   - Gson 序列化 lastHomeBean → home_data.json（复用 DataPersistAccessor 同款 Gson()，已验证 HomeBean 可序列化）。
+   - 遍历图片字段全集收集 URL 去重：carouselMapList[].imgUrl、carouselMapList[].appInfo.appIcon、hotAppInfoList[].appIcon、appClassList[].appList[].appIcon（magnanimityDataList/header 不渲染，忽略）。
+   - OkHttp 同步 GET 每张图 → images/<md5(url)>.bin；失败则跳过并记录（不中断）。
+   - 写 image_map.json（URL→文件名）。
+   - ZipUtils.zipFiles(...)（blankj，已依赖）打包 → getExternalFilesDir(null)/home_seed.zip。
+   - Toast + Log 输出最终路径与图片成功/失败计数。
+ 4. 整个导出器入口用 if (BuildConfig.DEBUG) 守护，量产不触发。
+
+ 接入点 NewRecommendViewModel.kt:203（postValue(HomeSuccess(newHomeBean)) 后）：加 SeedExporter.updateLatest(newHomeBean)。
+
+ 工具复用：OkHttp（已依赖）、blankj ZipUtils/FileIOUtils/FileUtils、Gson。
+
+ B. app-mock 加「导出首屏镜像」按钮（一次性自增计数器指令）
+
+ - app-mock-sdk/.../AppMockData.kt：加字段 val exportSeedTrigger: Long = 0L。
+ - app-mock-sdk/.../AppMockSdk.kt：JSON 解析加 exportSeedTrigger = it.optLong("export_seed_trigger", 0L)。
+ - app-mock-app/.../AppMockService.kt：handleGetMockData 的 getAll 分支加 .put("export_seed_trigger", sp.getLong(...))。
+ - app-mock-app/.../MainActivity.kt：Card3 加 btnExportSeed；点击 → SP 计数器+1 → sendIpcRequest("notifyChanged","") → Toast。
+ - app-mock-app/.../res/layout/activity_main.xml：Card3（调试操作）加一个 MaterialButton。
+
+ 主 app 侧由 A 的 SeedExporter 订阅 exportSeedTrigger 变化触发，无需改 PerfTracker。
+
+ C. 加载器 SeedStore（正式功能，离线渲染首屏）
+
+ 新建 sample/app-market/src/main/java/com/appmarket/automotive/seed/SeedStore.kt（object 单例）：
+ - getSeedHomeBean(): HomeBean? — lazy 读 assets/home_seed/home_data.json，Gson 反序列化（失败返回 null）。
+ - resolveImageAsset(url): String? — 读 image_map.json，命中返回 file:///android_asset/home_seed/images/<file>，否则 null。
+ - @Volatile var seedActive: Boolean（默认 true）。
+ - 读 assets 用 context.assets.open(...)（无现成封装，自建轻量读取）。
+
+ 渲染优先级（改 NewRecommendViewModel.getHomeBeanData()，当前缓存逻辑见 :55-94、:230）：
+ 1. showCachedHomeIfHit() 命中 MMKV → 显示 MMKV（运行时最新，优先级最高）。
+ 2. 未命中 MMKV 但有 seed → postValue(HomeSuccess(seedHomeBean))，seedActive=true（出厂兜底，断网/首装可离线显示）。
+ 3. 都没有 → Loading。
+ （即在 :61-64 的 if(!shownCache) 分支里，插入"先试 seed，再 Loading"。）
+
+ 图片走 seed（改 GlideImageLoader.loadImage() GlideImageLoader.kt:27）：
+ val model = if (SeedStore.seedActive) SeedStore.resolveImageAsset(url) ?: url else url
+ Glide.with(imageView).load(model)...
+ Glide 原生支持 file:///android_asset/，无需自定义 ModelLoader。
+
+ D. 全量刷新语义（用户强调：不可残留 seed）
+
+ - NewRecommendViewModel.getHomeData() 网络成功 postValue(HomeSuccess(newHomeBean))（:203）本就是整体替换，不 merge → 天然全量。
+ - 在 :203 同处置 SeedStore.seedActive = false：此后 adapter rebind 用真实 URL 走网络（拿最新图），seed 数据与图片完全退场。
+ - 网络失败时保持 seed（离线展示），不置 false、不写 MMKV，避免把 seed 当成"成功数据"污染。
+
+ ---
+ 实施顺序与你需要配合的环节
+
+ 1. 我：实现 A+B+C+D 全部代码改动，编译 avatr8155Dev/avatr8678Dev Debug 通过。
+ 2. 我：出一版带导出器的 Debug APK（此时 assets 还没 seed）。
+ 3. 你/我：真机装该 APK + app-mock，联网进应用市场首页等数据加载完。
+ 4. 你/我：app-mock 点「导出首屏镜像」→ 生成 /sdcard/Android/data/com.appmarket.automotive/files/home_seed.zip。
+ 5. 我：adb pull zip → 解压 → 放 sample/app-market/src/avatr8678/assets/home_seed/（实施时确认 avatr8155 是否共享该 sourceSet：共享则一份覆盖两渠道，独立则各抓各放）。
+ 6. 我：重新出 APK（这次内置 seed）。
+ 7. 验证（见下）。
+
+ 验证
+
+ - 离线首屏：断网冷启动 → 首页立即显示 seed 的 banner+图标（无 Loading、无白图），日志 seedActive=true。
+ - 全量刷新：联网冷启动 → 先 seed 秒显 → 网络返回后整页替换为网络数据，seedActive=false，图片走网络；确认 seed 里有但网络没返回的条目不残留。
+ - 可编辑：手改 home_data.json 某 banner 标题 → 重出包 → 断网进首页显示改后内容。
+ - 导出器：app-mock 点按钮 → Toast 成功 + zip 存在 + 解压后 json/images 完整。
+ - 编译验证：:app-market:compileAvatr8155DevDebugKotlin 与 compileAvatr8678DevDebugKotlin。
+
+ 风险/待确认
+
+ - avatr8155 与 avatr8678 的 assets sourceSet 共享性（步骤 5 确认）。
+ - 图片 CDN 若有防盗链，导出下载可能失败 → 已设计为跳过+记录，必要时补 Referer/UA。
+ - seed JSON 含 ServerAppInfo 的运行时字段（下载态等），仅用于首屏展示，联网即被全量覆盖，可接受。

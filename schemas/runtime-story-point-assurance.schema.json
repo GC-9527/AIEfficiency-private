@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Runtime Story Point Assurance Result v4.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "story_point_id",
+    "sources",
+    "source_snapshot_hash",
+    "change_type",
+    "risk_tier",
+    "candidates",
+    "claims",
+    "impact_matrix",
+    "gates",
+    "blocking_findings",
+    "residual_risks",
+    "story_point_decision",
+    "source_sync_decision",
+    "source_sync_status"
+  ],
+  "properties": {
+    "story_point_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "system",
+          "issue_id",
+          "snapshot_hash"
+        ],
+        "properties": {
+          "system": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issue_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "snapshot_hash": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "source_snapshot_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "change_type": {
+      "enum": [
+        "FEATURE",
+        "DEFECT_FIX",
+        "REFACTOR",
+        "CONFIG_OR_DATA",
+        "PACKAGE_OR_RELEASE",
+        "TEST_OR_HARNESS",
+        "REVIEW_OR_ANALYSIS",
+        "DOCUMENTATION",
+        "MIXED"
+      ]
+    },
+    "risk_tier": {
+      "enum": [
+        "STORY-FAST",
+        "STORY-STANDARD",
+        "STORY-CRITICAL"
+      ]
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "repository",
+          "base_ref",
+          "head_ref",
+          "diff_hash",
+          "environment_id"
+        ],
+        "properties": {
+          "repository": {
+            "type": "string",
+            "minLength": 1
+          },
+          "base_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "head_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "diff_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "environment_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "statement",
+          "evidence_ids"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "FACT",
+              "INFERENCE",
+              "UNKNOWN"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "impact_matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "direct_consumers",
+        "boundary_and_errors",
+        "state_lifecycle_concurrency",
+        "data_cache_migration",
+        "permission_security_privacy",
+        "network_timeout_retry",
+        "api_sdk_compatibility",
+        "flavor_device_platform",
+        "build_package_install_upgrade",
+        "performance_resources",
+        "observability_recovery_rollback",
+        "harness_connector_false_results"
+      ],
+      "properties": {
+        "direct_consumers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "boundary_and_errors": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "state_lifecycle_concurrency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "data_cache_migration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "permission_security_privacy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "network_timeout_retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "api_sdk_compatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "flavor_device_platform": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "build_package_install_upgrade": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "performance_resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "observability_recovery_rollback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        },
+        "harness_connector_false_results": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE",
+                "UNKNOWN"
+              ]
+            },
+            "basis": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "result",
+          "evidence_ids"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "SKIPPED",
+              "BLOCKED"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "blocking_findings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "story_point_decision": {
+      "enum": [
+        "VERIFIED",
+        "PARTIAL",
+        "BLOCKED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "source_sync_decision": {
+      "enum": [
+        "ALLOWED",
+        "MANUAL_APPROVAL",
+        "DENIED"
+      ]
+    },
+    "source_sync_status": {
+      "enum": [
+        "NOT_ATTEMPTED",
+        "SUCCEEDED",
+        "FAILED",
+        "PARTIAL"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "story_point_decision": {
+            "const": "VERIFIED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocking_findings": {
+            "maxItems": 0
+          },
+          "source_sync_decision": {
+            "const": "ALLOWED"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "story_point_decision": {
+            "const": "PARTIAL"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_sync_decision": {
+            "const": "MANUAL_APPROVAL"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "story_point_decision": {
+            "const": "BLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_sync_decision": {
+            "const": "DENIED"
+          }
+        }
+      }
+    }
+  ]
+}

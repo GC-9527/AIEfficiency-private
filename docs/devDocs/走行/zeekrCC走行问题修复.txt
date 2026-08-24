@@ -1,0 +1,38 @@
+ 已定位并完成代码修复。根因不是遮罩/UI 逻辑，而是 zeekrCc 复用了 zeekr9x 的 CAI 走行信号源，但 CC1E 车机不存在对应 CAI 服务。
+
+  ### 根因证据
+
+  - /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/docs/tempFiles/20260813/log1.txt:31312 持续提示找不到 carappinit.provider.active。
+  - /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/docs/tempFiles/20260813/log1.txt:427 明确记录 HwCarService ... not found。
+  - 车型确认为 CC1E-EU。
+  - 同一日志存在真实 ECARX 挡位信号：
+      - P 挡：sensor=2097664, value=2097712
+      - D 挡：sensor=2097664, value=2097696
+
+  由于原 Release 版本只读取 CAI，CAI 连接失败后状态一直是 Unknown/false，所以走行限制始终不会生效。
+
+  ### 修复内容
+
+  - 新增 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/src/zeekr9x/java/com/appmarket/automotive/restriction/ZeekrCcGearRestrictionSource.kt:14：
+      - 仅 zeekrCc 使用 ECARX SENSOR_TYPE_GEAR。
+      - P 挡解除限制。
+      - D/N/R、1～10 挡启用限制。
+      - 未知值保持 Unknown，避免误判。
+      - 支持首次挡位读取、实时回调和释放时取消监听。
+
+  - /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/src/zeekr9x/java/com/appmarket/automotive/Zeekr9xPlatformBridge.kt:272 按 BuildConfig.CHANNEL 分流：
+      - zeekrCc → ECARX 挡位
+      - zeekr9x → 保持原 CAI 路径
+
+  - 使用公共 ICar/ISensor 接口反射，避免实现类访问问题，也没有把 AdaptAPI jar 重复打入 APK。
+  - 增加 /D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/src/testZeekrCc/java/com/appmarket/automotive/restriction/ZeekrCcGearRestrictionPolicyTest.kt:9。
+
+  ### 验证结果
+
+  - 定向单测：6/6 通过。
+  - assembleZeekrCcProdRelease：BUILD SUCCESSFUL。
+  - APK：/D:/workspace/xsProjects/202605/AISdkV4/2026AppMarketAIV5/sample/app-market/build/outputs/apk/zeekrCcProd/release/AppMarket-1.4.60-10460-zeekrCcProd-release.apk
+  - SHA-256：947F745544941926941FF3DAEB5396E25808EE17D1092FC1E99B89D94EA662B6
+  - APK v3 签名验证通过，未包含重复 ECARX AdaptAPI 类。
+  - 独立验收结论：PARTIAL。代码、单测和正式构建通过，但设备 99271FFBA000R8 当前为 unauthorized，尚不能安装后执行 P/D 实车换挡闭环验证。
+  - 未提交 Git commit。
